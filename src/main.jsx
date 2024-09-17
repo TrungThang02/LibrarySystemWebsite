@@ -8,7 +8,7 @@ import MakeAppointments from './pages/MakeAppointments.jsx';
 import { AuthProvider } from '../context/authContext/index.jsx';
 
 import ProtectedRoute from './pages/Auth/ProtectedRoute.jsx';
-import './index.css';
+import './App.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
