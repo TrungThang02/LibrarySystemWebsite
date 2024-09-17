@@ -113,6 +113,7 @@ const BookCategory = () => {
             <th className="py-2 px-4 border-r">Tên danh mục sách</th>
             <th className="py-2 px-4"></th>
           </tr>
+          
         </thead>
         <tbody>
           {BookCategorys.map(BookCategory => (
