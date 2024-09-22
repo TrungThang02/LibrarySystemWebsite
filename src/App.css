@@ -46,7 +46,7 @@ main{
   transition: all 0.5s;
 }
 .link:hover{
-  background: #87A7FF;
+  background: #9db3f0;
   color: #ffffff;
   transition: all 0.5s;
 }
@@ -69,5 +69,15 @@ main{
   flex-direction: row;
 }
 .logo{
-  width: 150px;
+  width: 100%;
+  display: flex !important;
+  align-items:center ;
+  justify-content: center;
+
+
+ 
+}
+.logo .logo-img{
+  width: 190px;
+  align-items:  center;
 }

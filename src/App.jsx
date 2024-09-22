@@ -9,6 +9,7 @@ import MakeAppointments from './pages/MakeAppointments';
 import VaccineInfo from './pages/VaccineInfo';
 import { AuthProvider } from '../context/authContext';
 import News from './pages/News';
+import Books from './pages/Books';
 import './index.css';
 import './App.css'
 const App = () => {
@@ -21,6 +22,7 @@ const App = () => {
           <Route path="/makeappointments" element={<MakeAppointments />} />
           <Route path="/news" element={<News />} />
           <Route path="/vaccineinfo" element={<VaccineInfo />} />
+          <Route path="/books" element={<Books />} />
         </Routes>
       </Sidebar>
 

@@ -13,13 +13,13 @@ import {
     FaRegNewspaper 
 }from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
-import logo from "../assets/logo.png";
+import logo from "../assets/tdmulogo.jpg";
 
 
 
 const Sidebar = ({children}) => {
     const[isOpen ,setIsOpen] = useState(true);
-    const toggle = () => setIsOpen (!isOpen);
+
    
     const menuItem=[
         {
@@ -28,7 +28,7 @@ const Sidebar = ({children}) => {
             icon:<FaRegCalendarAlt />
         },
         {
-            path:"/makeappointments",
+            path:"/books",
             name:"Quản lý sách",
             icon:<FaRegCalendarCheck />
         },
@@ -48,12 +48,10 @@ const Sidebar = ({children}) => {
     return (
   
         <div className="container">
-           <div style={{width: isOpen ? "300px" : "10px"}} className="sidebar">
+           <div style={{width: "300px"}} className="sidebar">
                <div className="top_section">
-                   <div style={{display: isOpen ? "block" : "none"}} className="logo">
-                   <img className='logo' src={logo} alt="Logo"/>
-
-                  
+                   <div className="logo">
+                   <img className='logo-img' src={logo} alt="Logo"/>                  
                    </div>
                  
                </div>
