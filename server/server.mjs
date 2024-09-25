@@ -21,7 +21,7 @@ app.post('/send-email', (req, res) => {
     });
 
     const mailOptions = {
-        from: '"Hệ thống Quản lý Tiêm Chủng" <trantrungthang01699516993@gmail.com>', 
+        from: '"Hệ thống Quản lý Thư viện Đại học Thủ Dầu Một" <trantrungthang01699516993@gmail.com>', 
         to: recipient,
         subject: subject,
         html: html

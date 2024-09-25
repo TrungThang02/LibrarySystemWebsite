@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebase/firebase';
 import { collection, getDocs, addDoc, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import Swal from 'sweetalert2';
+
+import "../assets/modal.css";
 const BookCategory = () => {
   const [BookCategorys, setBookCategorys] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -139,37 +141,38 @@ const BookCategory = () => {
       </table>
 
       {showModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center ">
-          <div className="bg-white p-4 rounded shadow-lg">
-            <h2 className="text-xl font-bold mb-4">{isEditing ? "Chỉnh sửa Danh mục" : "Thêm Danh mục"}</h2>
-            <div className="mb-4">
-              <label className="block text-gray-700">Tên danh mục sách</label>
-              <input
-                type="text"
-                name="Name"
-                value={newBookCategory.Name}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-              />
-            </div>
-           
-            <div className="flex justify-end">
-              <button
-                onClick={handleCloseModal}
-                className="bg-gray-500 text-white py-2 px-4 rounded mr-2"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleSave}
-                className="bg-blue-500 text-white py-2 px-4 rounded"
-              >
-                {isEditing ? "Cập nhật" : "Lưu"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+  <div className={`fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center modal-overlay ${showModal ? 'show' : ''}`}>
+    <div className={`bg-white p-4 rounded shadow-lg w-full max-w-xl md:max-w-xs lg:max-w-xs modal ${showModal ? 'show' : ''}`}>
+      <h2 className="text-xl font-bold mb-4">{isEditing ? "Chỉnh sửa danh mục" : "Thêm danh mục"}</h2>
+      <div className="mb-4">
+        <input
+          type="text"
+          name="Name"
+          placeholder="Nhập tên danh mục sách"
+          value={newBookCategory.Name}
+          onChange={handleChange}
+
+            className="w-full p-2 border border-gray-300 rounded"
+        />
+      </div>
+      <div className="flex justify-end">
+        <button
+          onClick={handleCloseModal}
+          className="bg-gray-500 text-white py-2 px-4 rounded mr-2"
+        >
+          Hủy
+        </button>
+        <button
+          onClick={handleSave}
+          className="bg-blue-500 text-white py-2 px-4 rounded"
+        >
+          {isEditing ? "Cập nhật sách" : "Lưu"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

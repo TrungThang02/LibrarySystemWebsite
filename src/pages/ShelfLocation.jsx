@@ -3,8 +3,8 @@ import { db } from '../firebase/firebase';
 import { collection, getDocs, addDoc, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import Swal from 'sweetalert2';
 
-import "../assets/modal.css";
-const Books = () => {
+import "../assets/modal.css";   
+const ShelfLocation = () => {
   const [BookCategorys, setBookCategorys] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -102,7 +102,7 @@ const Books = () => {
 
   return (
     <div className="mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Quản lý sách</h2>
+      <h2 className="text-2xl font-bold mb-4">Danh mục</h2>
       <button
         className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-green-600 mb-4 "
         onClick={handleOpenModal}
@@ -112,11 +112,7 @@ const Books = () => {
       <table className="min-w-full bg-white border border-gray-300">
         <thead>
           <tr className="w-full bg-gray-100 border-b">
-          <th className="py-2 px-4 border-r">Hình ảnh</th>
-            <th className="py-2 px-4 border-r">Tên sách</th>
-            <th className="py-2 px-4 border-r">Nhà xuất bản</th>
-            <th className="py-2 px-4 border-r">Mô tả sách</th>
-            <th className="py-2 px-4 border-r">Số lượng</th>
+            <th className="py-2 px-4 border-r">Tên danh mục sách</th>
             <th className="py-2 px-4"></th>
           </tr>
           
@@ -128,7 +124,7 @@ const Books = () => {
               <td className="py-2 px-4 flex gap-2">
                 <button
                   className="bg-yellow-500 text-white py-1 px-2 rounded"
-                  onClick={() => handleEdit(BookCategory)}  
+                  onClick={() => handleEdit(BookCategory)}
                 >
                   Sửa
                 </button>
@@ -155,7 +151,7 @@ const Books = () => {
           placeholder="Nhập tên danh mục sách"
           value={newBookCategory.Name}
           onChange={handleChange}
-           className="w-full p-2 border border-gray-300 rounded"
+          className="w-full p-2 border border-gray-300 rounded"
         />
       </div>
       <div className="flex justify-end">
@@ -169,7 +165,7 @@ const Books = () => {
           onClick={handleSave}
           className="bg-blue-500 text-white py-2 px-4 rounded"
         >
-          {isEditing ? "Cập nhật sách" : "Lưu"}
+          {isEditing ? "Cập nhật kệ" : "Lưu"}
         </button>
       </div>
     </div>
@@ -180,4 +176,4 @@ const Books = () => {
   );
 };
 
-export default Books;
+export default ShelfLocation;

@@ -10,7 +10,12 @@ import {
     FaRegCalendarAlt ,
     FaRegCalendarCheck ,
     FaExclamationCircle ,
-    FaRegNewspaper 
+    FaRegNewspaper,
+    FaFolder,
+    FaExchangeAlt,
+    FaBook,
+    FaListAlt
+    
 }from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
 import logo from "../assets/tdmulogo.jpg";
@@ -25,17 +30,22 @@ const Sidebar = ({children}) => {
         {
             path:"/",
             name:"Quản lý danh mục sách",
-            icon:<FaRegCalendarAlt />
+            icon:<FaListAlt />
         },
         {
             path:"/books",
             name:"Quản lý sách",
-            icon:<FaRegCalendarCheck />
+            icon:<FaBook />
+        },
+        {
+            path:"/shelf",
+            name:"Kệ sách",
+            icon:<FaFolder />
         },
         {
             path:"/vaccineinfo",
             name:"Đổi/Trả sách",
-            icon:<FaExclamationCircle />
+            icon:<FaExchangeAlt/>
         },
         {
             path:"/user",

@@ -1,0 +1,22 @@
+
+.modal {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  }
+  
+
+  .modal.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  .modal-overlay {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  .modal-overlay.show {
+    opacity: 1;
+  }
+  
