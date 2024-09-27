@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { db, storage } from '../firebase/firebase'; // Đảm bảo rằng bạn đã import storage
 import { collection, getDocs, addDoc, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Thêm import cho Storage
@@ -22,11 +23,20 @@ const Books = () => {
     quantity: '',
     condition: '',
     location: '',
-    coverImage: ''
+    coverImage: '',
+    pdfUrl: ''
   });
   const [shelves, setShelves] = useState([]);
   const [categories, setCategories] = useState([]); // Danh sách thể loại
   const [coverImageFile, setCoverImageFile] = useState(null); // Trạng thái lưu tệp hình ảnh
+  const [pdfFile, setPdfFile] = useState(null);
+
+  const navigate = useNavigate(); // Sử dụng useNavigate
+
+  const handleViewDetail = (id) => {
+    navigate(`/book-detail/${id}`); // Điều hướng đến trang chi tiết với id sách
+  };
+
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -99,9 +109,11 @@ const Books = () => {
       quantity: '',
       condition: '',
       location: '',
-      coverImage: ''
+      coverImage: '',
+      pdfUrl: ''
     });
     setCoverImageFile(null); // Reset file image
+    setPdfFile(null);
   };
 
   const handleChange = (e) => {
@@ -116,29 +128,38 @@ const Books = () => {
     const file = e.target.files[0];
     setCoverImageFile(file); // Lưu tệp hình ảnh
   };
+  const handlePdfChange = (e) => {
+    const file = e.target.files[0];
+    setPdfFile(file); // Lưu tệp PDF
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       let coverImageUrl = newBook.coverImage;
-
+      let pdfUrl = newBook.pdfUrl;
       // Nếu có tệp hình ảnh được chọn, tải lên Firebase Storage
       if (coverImageFile) {
         const storageRef = ref(storage, `coverImages/${coverImageFile.name}`);
         await uploadBytes(storageRef, coverImageFile); // Tải tệp lên
         coverImageUrl = await getDownloadURL(storageRef); // Lấy URL tải lên
       }
-
+      // Nếu có tệp PDF được chọn, tải lên Firebase Storage
+      if (pdfFile) {
+        const pdfRef = ref(storage, `pdfs/${pdfFile.name}`);
+        await uploadBytes(pdfRef, pdfFile);
+        pdfUrl = await getDownloadURL(pdfRef); // Lấy URL của PDF
+      }
       if (isEditing && currentBookId) {
         const BookRef = doc(db, 'books', currentBookId);
-        await updateDoc(BookRef, { ...newBook, coverImage: coverImageUrl });
+        await updateDoc(BookRef, { ...newBook, coverImage: coverImageUrl, pdfUrl });
         setBooks(prev => prev.map(Book =>
-          Book.id === currentBookId ? { ...Book, ...newBook, coverImage: coverImageUrl } : Book
+          Book.id === currentBookId ? { ...Book, ...newBook, coverImage: coverImageUrl, pdfUrl } : Book
         ));
       } else {
         const BooksCollection = collection(db, 'books');
-        const docRef = await addDoc(BooksCollection, { ...newBook, coverImage: coverImageUrl });
-        setBooks([...Books, { id: docRef.id, ...newBook, coverImage: coverImageUrl }]);
+        const docRef = await addDoc(BooksCollection, { ...newBook, coverImage: coverImageUrl, pdfUrl });
+        setBooks([...Books, { id: docRef.id, ...newBook, coverImage: coverImageUrl, pdfUrl }]);
       }
 
       handleCloseModal();
@@ -211,11 +232,18 @@ const Books = () => {
                   Sửa
                 </button>
                 <button
+                  className="bg-blue-500 text-white py-1 px-2 rounded"
+                  onClick={() => handleViewDetail(Book.id)} // Nút Xem chi tiết
+                >
+                  Xem chi tiết
+                </button>
+                <button
                   className="bg-red-500 text-white py-1 px-2 rounded"
                   onClick={() => handleDelete(Book.id)}
                 >
                   Xóa
                 </button>
+
               </td>
             </tr>
           ))}
@@ -224,7 +252,7 @@ const Books = () => {
 
       {showModal && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-          <div className="bg-white p-8 rounded shadow-lg w-full max-w-2xl">
+          <div className="bg-white p-5 rounded shadow-lg w-full max-w-2xl">
             <h2 className="text-xl font-bold mb-4">{isEditing ? "Chỉnh sửa sách" : "Thêm sách"}</h2>
             <form onSubmit={handleSubmit} className="grid grid-cols-3 gap-4">
               <div>
@@ -336,14 +364,19 @@ const Books = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Tình trạng:</label>
-                <input
-                  type="text"
+                <select
                   name="condition"
                   value={newBook.condition}
                   onChange={handleChange}
                   className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                />
+                  required
+                >
+                  <option value="">Chọn tình trạng</option>
+                  <option value="Chưa mượn">Chưa mượn</option>
+                  <option value="Đã mượn">Đã mượn</option>
+                </select>
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700">Vị trí:</label>
                 <select
@@ -361,15 +394,19 @@ const Books = () => {
                   ))}
                 </select>
               </div>
-         
-                <label className="block text-sm font-medium text-gray-700">Tải ảnh bìa:</label>
-                <div className="col-span-3 flex justify-end">
+
+              <label className="block text-sm font-medium text-gray-700">Tải ảnh bìa:</label>
+              <div className="col-span-3 flex justify-end">
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={handleFileChange} // Xử lý thay đổi tệp
+                  onChange={handleFileChange}
                   className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 />
+              </div>
+              <label className="block text-sm font-medium text-gray-700">Tải file sách:</label>
+              <div className="col-span-3 flex justify-end">
+                <input type="file" accept="application/pdf" onChange={handlePdfChange} className="mt-1 block w-full p-2 border border-gray-300 rounded"/>
               </div>
               <div className="col-span-3 flex justify-end">
                 <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded">

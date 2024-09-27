@@ -11,7 +11,8 @@ import { AuthProvider } from '../context/authContext';
 import News from './pages/News';
 import Books from './pages/Books';
 
-import ShelfLocation from './pages/shelfLocation';
+import ShelfLocation from './pages/ShelfLocation';
+import BookDetail from './pages/BookDetail';
 
 import './index.css';
 import './App.css'
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="/vaccineinfo" element={<VaccineInfo />} />
           <Route path="/books" element={<Books />} />
           <Route path="/shelf" element={<ShelfLocation />} />
+          <Route path="/book-detail/:id" element={<BookDetail />} />
         
 
         </Routes>

@@ -5,10 +5,10 @@ import Swal from 'sweetalert2';
 
 const ShelfLocation = () => {
   const [BookShelfs, setBookShelfs] = useState([]);
-  const [showModal, setShowModal] = useState(false); // Trạng thái để hiển thị modal
+  const [showModal, setShowModal] = useState(false); 
   const [isEditing, setIsEditing] = useState(false);
   const [currentBookShelfId, setCurrentBookShelfId] = useState(null);
-  const [newBookShelf, setNewBookShelf] = useState({ BookShelfName: '' });
+  const [newBookShelf, setNewBookShelf] = useState({ BookShelfName: '', Quantity: '' });
 
   useEffect(() => {
     const fetchBookShelfs = async () => {
@@ -28,11 +28,11 @@ const ShelfLocation = () => {
     fetchBookShelfs();
   }, []);
 
-  const handleOpenModal = () => setShowModal(true); // Mở modal
+  const handleOpenModal = () => setShowModal(true); // Open modal
   const handleCloseModal = () => {
-    setShowModal(false); // Đóng modal
+    setShowModal(false); // Close modal
     setIsEditing(false);
-    setNewBookShelf({ BookShelfName: '' });
+    setNewBookShelf({ BookShelfName: '', Quantity: '' });
   };
 
   const handleChange = (e) => {
@@ -66,7 +66,7 @@ const ShelfLocation = () => {
   };
 
   const handleEdit = (BookShelf) => {
-    setNewBookShelf({ BookShelfName: BookShelf.BookShelfName });
+    setNewBookShelf({ BookShelfName: BookShelf.BookShelfName, Quantity: BookShelf.Quantity });
     setCurrentBookShelfId(BookShelf.id);
     setIsEditing(true);
     handleOpenModal();
@@ -104,7 +104,7 @@ const ShelfLocation = () => {
       <h2 className="text-2xl font-bold mb-4">Quản lý kệ sách</h2>
       <button
         className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-green-600 mb-4"
-        onClick={handleOpenModal} // Kích hoạt mở modal
+        onClick={handleOpenModal} // Open modal
       >
         Thêm kệ sách
       </button>
@@ -112,6 +112,7 @@ const ShelfLocation = () => {
         <thead>
           <tr className="w-full bg-gray-100 border-b">
             <th className="py-2 px-4 border-r">Tên kệ sách</th>
+            <th className="py-2 px-4 border-r">Số lượng</th>
             <th className="py-2 px-4"></th>
           </tr>
         </thead>
@@ -119,6 +120,7 @@ const ShelfLocation = () => {
           {BookShelfs.map(BookShelf => (
             <tr key={BookShelf.id} className="border-b hover:bg-gray-50">
               <td className="py-2 px-4 border-r">{BookShelf.BookShelfName}</td>
+              <td className="py-2 px-4 border-r">{BookShelf.Quantity}</td>
               <td className="py-2 px-4 flex gap-2">
                 <button
                   className="bg-yellow-500 text-white py-1 px-2 rounded"
@@ -148,6 +150,16 @@ const ShelfLocation = () => {
                 name="BookShelfName"
                 placeholder="Nhập tên kệ sách"
                 value={newBookShelf.BookShelfName}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <input
+                type="number"
+                name="Quantity"
+                placeholder="Nhập số lượng"
+                value={newBookShelf.Quantity}
                 onChange={handleChange}
                 className="w-full p-2 border border-gray-300 rounded"
               />
