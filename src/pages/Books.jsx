@@ -31,10 +31,10 @@ const Books = () => {
   const [coverImageFile, setCoverImageFile] = useState(null); // Trạng thái lưu tệp hình ảnh
   const [pdfFile, setPdfFile] = useState(null);
 
-  const navigate = useNavigate(); // Sử dụng useNavigate
+  const navigate = useNavigate(); 
 
   const handleViewDetail = (id) => {
-    navigate(`/book-detail/${id}`); // Điều hướng đến trang chi tiết với id sách
+    navigate(`/book-detail/${id}`); 
   };
 
 
