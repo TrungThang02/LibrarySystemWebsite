@@ -5,14 +5,16 @@ import Home from './pages/Home';
 import User from './pages/User';
 import Login from './pages/Auth/Login';
 import Appointment from './pages/BookCategory';
-import MakeAppointments from './pages/MakeAppointments';
-import VaccineInfo from './pages/VaccineInfo';
+
+import BorrowReturnBooks from './pages/BorrowReturnBooks';
 import { AuthProvider } from '../context/authContext';
 import News from './pages/News';
 import Books from './pages/Books';
 
 import ShelfLocation from './pages/ShelfLocation';
 import BookDetail from './pages/BookDetail';
+import Author from './pages/Author';
+import Publisher from './pages/Publisher';
 
 import './index.css';
 import './App.css'
@@ -23,12 +25,13 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Appointment />} />
           <Route path="/user" element={<User />} />
-          <Route path="/makeappointments" element={<MakeAppointments />} />
           <Route path="/news" element={<News />} />
-          <Route path="/vaccineinfo" element={<VaccineInfo />} />
+          <Route path="/return" element={<BorrowReturnBooks />} />
           <Route path="/books" element={<Books />} />
           <Route path="/shelf" element={<ShelfLocation />} />
-          <Route path="/book-detail/:id" element={<BookDetail />} />
+          <Route path="/publisher" element={<Publisher />} />
+          <Route path="/author" element={<Author/>} />
+          
         
 
         </Routes>

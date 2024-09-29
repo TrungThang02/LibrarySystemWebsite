@@ -169,7 +169,7 @@ const BookCategory = () => {
               <button
                 onClick={handleSave}
                 className={`bg-blue-500 text-white py-2 px-4 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={loading} // Disable button during loading
+                disabled={loading} 
               >
                 {loading ? "Đang lưu..." : (isEditing ? "Cập nhật" : "Lưu")}
               </button>

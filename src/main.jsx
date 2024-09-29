@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import App from './App.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Auth/Login.jsx';
-import MakeAppointments from './pages/MakeAppointments.jsx';
+
 import { AuthProvider } from '../context/authContext/index.jsx';
 
 import ProtectedRoute from './pages/Auth/ProtectedRoute.jsx';

@@ -25,7 +25,7 @@ const BookDetail = () => {
     fetchBookDetail();
   }, [id]);
 
-  if (!book) return <div className="flex justify-center items-center h-screen text-lg font-medium">Loading...</div>;
+  if (!book) return <div className="flex justify-center items-center h-screen text-lg font-medium">Đang tải...</div>;
 
   return (
     <div className="p-8 max-w-5xl mx-auto bg-white rounded-lg shadow-md my-10">

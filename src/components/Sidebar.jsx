@@ -33,6 +33,17 @@ const Sidebar = ({children}) => {
             icon:<FaListAlt />
         },
         {
+            path:"/publisher",
+            name:"Quản lý nhà xuất bản",
+            icon:<FaBook />
+        },
+        {
+            path:"/author",
+            name:"Quản lý tác giả",
+            icon:<FaBook />
+        },
+        
+        {
             path:"/books",
             name:"Quản lý sách",
             icon:<FaBook />
@@ -43,8 +54,8 @@ const Sidebar = ({children}) => {
             icon:<FaFolder />
         },
         {
-            path:"/vaccineinfo",
-            name:"Đổi/Trả sách",
+            path:"/return",
+            name:"Mượn/Trả sách",
             icon:<FaExchangeAlt/>
         },
         {
