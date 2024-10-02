@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { db, storage } from '../firebase/firebase'; // Đảm bảo rằng bạn đã import storage
+import { db, storage } from '../firebase/firebase';
 import { collection, getDocs, addDoc, doc, deleteDoc, updateDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Thêm import cho Storage
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Swal from 'sweetalert2';
 
 const Books = () => {
@@ -13,30 +13,40 @@ const Books = () => {
   const [newBook, setNewBook] = useState({
     title: '',
     author: '',
+    category: '',
     publisher: '',
-    publicationYear: '',
-    isbn: '',
-    language: '',
-    genre: '', // Thể loại
-    pageCount: '',
     description: '',
+    date: '',
+    type: '',
+    format: '',
+    identifier: '',
+    source: '',
+    language: '',
+    relation: '',
+    coverage: '',
+    rights: '',
+    pageCount: '',
     quantity: '',
     condition: '',
     location: '',
     coverImage: '',
-    pdfUrl: ''
+    pdfUrl: '',
+    audioUrl: '',
+    status: 'available'
   });
   const [shelves, setShelves] = useState([]);
-  const [categories, setCategories] = useState([]); // Danh sách thể loại
-  const [coverImageFile, setCoverImageFile] = useState(null); // Trạng thái lưu tệp hình ảnh
+  const [categories, setCategories] = useState([]);
+  const [publishers, setPublishers] = useState([]);
+  const [authors, setAuthors] = useState([]);
+  const [coverImageFile, setCoverImageFile] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
+  const [audioFile, setAudioFile] = useState(null);
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleViewDetail = (id) => {
-    navigate(`/book-detail/${id}`); 
+    navigate(`/book-detail/${id}`);
   };
-
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -63,7 +73,7 @@ const Books = () => {
         const shelvesSnapshot = await getDocs(shelvesCollection);
         const shelvesList = shelvesSnapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data(),
+          name: doc.data().BookShelfName,
         }));
         setShelves(shelvesList);
       } catch (error) {
@@ -75,13 +85,13 @@ const Books = () => {
   }, []);
 
   useEffect(() => {
-    const fetchCategories = async () => { // Hàm lấy danh sách thể loại
+    const fetchCategories = async () => {
       try {
         const categoriesCollection = collection(db, 'category');
         const categoriesSnapshot = await getDocs(categoriesCollection);
         const categoriesList = categoriesSnapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data(),
+          name: doc.data().categoryName,
         }));
         setCategories(categoriesList);
       } catch (error) {
@@ -92,6 +102,42 @@ const Books = () => {
     fetchCategories();
   }, []);
 
+  useEffect(() => {
+    const fetchPublishers = async () => {
+      try {
+        const publishersCollection = collection(db, 'publisher');
+        const publishersSnapshot = await getDocs(publishersCollection);
+        const publishersList = publishersSnapshot.docs.map(doc => ({
+          id: doc.id,
+          name: doc.data().PublisherName,
+        }));
+        setPublishers(publishersList);
+      } catch (error) {
+        console.error("Error fetching publishers: ", error);
+      }
+    };
+
+    fetchPublishers();
+  }, []);
+
+  useEffect(() => {
+    const fetchAuthors = async () => {
+      try {
+        const authorsCollection = collection(db, 'author');
+        const authorsSnapshot = await getDocs(authorsCollection);
+        const authorsList = authorsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          name: doc.data().authorName,
+        }));
+        setAuthors(authorsList);
+      } catch (error) {
+        console.error("Error fetching authors: ", error);
+      }
+    };
+
+    fetchAuthors();
+  }, []);
+
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => {
     setShowModal(false);
@@ -99,21 +145,30 @@ const Books = () => {
     setNewBook({
       title: '',
       author: '',
+      category: '',
       publisher: '',
-      publicationYear: '',
-      isbn: '',
-      language: '',
-      genre: '', // Đặt lại thể loại
-      pageCount: '',
       description: '',
+      date: '',
+      type: '',
+      format: '',
+      identifier: '',
+      source: '',
+      language: '',
+      relation: '',
+      coverage: '',
+      rights: '',
+      pageCount: '',
       quantity: '',
       condition: '',
       location: '',
       coverImage: '',
-      pdfUrl: ''
+      pdfUrl: '',
+      audioUrl: '',
+      status: 'available'
     });
-    setCoverImageFile(null); // Reset file image
+    setCoverImageFile(null);
     setPdfFile(null);
+    setAudioFile(null);
   };
 
   const handleChange = (e) => {
@@ -126,11 +181,17 @@ const Books = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setCoverImageFile(file); // Lưu tệp hình ảnh
+    setCoverImageFile(file);
   };
+
   const handlePdfChange = (e) => {
     const file = e.target.files[0];
-    setPdfFile(file); // Lưu tệp PDF
+    setPdfFile(file);
+  };
+
+  const handleAudioChange = (e) => {
+    const file = e.target.files[0];
+    setAudioFile(file);
   };
 
   const handleSubmit = async (e) => {
@@ -138,28 +199,34 @@ const Books = () => {
     try {
       let coverImageUrl = newBook.coverImage;
       let pdfUrl = newBook.pdfUrl;
-      // Nếu có tệp hình ảnh được chọn, tải lên Firebase Storage
+      let audioUrl = newBook.audioUrl;
+
       if (coverImageFile) {
         const storageRef = ref(storage, `coverImages/${coverImageFile.name}`);
-        await uploadBytes(storageRef, coverImageFile); // Tải tệp lên
-        coverImageUrl = await getDownloadURL(storageRef); // Lấy URL tải lên
+        await uploadBytes(storageRef, coverImageFile);
+        coverImageUrl = await getDownloadURL(storageRef);
       }
-      // Nếu có tệp PDF được chọn, tải lên Firebase Storage
       if (pdfFile) {
         const pdfRef = ref(storage, `pdfs/${pdfFile.name}`);
         await uploadBytes(pdfRef, pdfFile);
-        pdfUrl = await getDownloadURL(pdfRef); // Lấy URL của PDF
+        pdfUrl = await getDownloadURL(pdfRef);
       }
+      if (audioFile) {
+        const audioRef = ref(storage, `audio/${audioFile.name}`);
+        await uploadBytes(audioRef, audioFile);
+        audioUrl = await getDownloadURL(audioRef);
+      }
+
       if (isEditing && currentBookId) {
         const BookRef = doc(db, 'books', currentBookId);
-        await updateDoc(BookRef, { ...newBook, coverImage: coverImageUrl, pdfUrl });
+        await updateDoc(BookRef, { ...newBook, coverImage: coverImageUrl, pdfUrl, audioUrl });
         setBooks(prev => prev.map(Book =>
-          Book.id === currentBookId ? { ...Book, ...newBook, coverImage: coverImageUrl, pdfUrl } : Book
+          Book.id === currentBookId ? { ...Book, ...newBook, coverImage: coverImageUrl, pdfUrl, audioUrl } : Book
         ));
       } else {
         const BooksCollection = collection(db, 'books');
-        const docRef = await addDoc(BooksCollection, { ...newBook, coverImage: coverImageUrl, pdfUrl });
-        setBooks([...Books, { id: docRef.id, ...newBook, coverImage: coverImageUrl, pdfUrl }]);
+        const docRef = await addDoc(BooksCollection, { ...newBook, coverImage: coverImageUrl, pdfUrl, audioUrl });
+        setBooks([...Books, { id: docRef.id, ...newBook, coverImage: coverImageUrl, pdfUrl, audioUrl }]);
       }
 
       handleCloseModal();
@@ -212,6 +279,7 @@ const Books = () => {
           <tr className="w-full bg-gray-100 border-b">
             <th className="py-2 px-4 border-r">Hình ảnh</th>
             <th className="py-2 px-4 border-r">Tên sách</th>
+            <th className="py-2 px-4 border-r">Tác giả</th>
             <th className="py-2 px-4 border-r">Nhà xuất bản</th>
             <th className="py-2 px-4 border-r">Số lượng</th>
             <th className="py-2 px-4"></th>
@@ -219,31 +287,18 @@ const Books = () => {
         </thead>
         <tbody>
           {Books.map(Book => (
-            <tr key={Book.id} className="border-b hover:bg-gray-50">
-              <td className="py-2 px-4 border-r"><img src={Book.coverImage} alt={Book.title} width="50" /></td>
+            <tr key={Book.id} className="border-b">
+              <td className="py-2 px-4 border-r">
+                <img src={Book.coverImage} alt={Book.title} className="w-16 h-24 object-cover" />
+              </td>
               <td className="py-2 px-4 border-r">{Book.title}</td>
+              <td className="py-2 px-4 border-r">{Book.author}</td>
               <td className="py-2 px-4 border-r">{Book.publisher}</td>
               <td className="py-2 px-4 border-r">{Book.quantity}</td>
-              <td className="py-2 px-4 flex gap-2">
-                <button
-                  className="bg-yellow-500 text-white py-1 px-2 rounded"
-                  onClick={() => handleEdit(Book)}
-                >
-                  Sửa
-                </button>
-                <button
-                  className="bg-blue-500 text-white py-1 px-2 rounded"
-                  onClick={() => handleViewDetail(Book.id)} // Nút Xem chi tiết
-                >
-                  Xem chi tiết
-                </button>
-                <button
-                  className="bg-red-500 text-white py-1 px-2 rounded"
-                  onClick={() => handleDelete(Book.id)}
-                >
-                  Xóa
-                </button>
-
+              <td className="py-2 px-4">
+                <button onClick={() => handleEdit(Book)} className="rounded py-1 px-4 bg-blue-300">Sửa</button>
+                <button onClick={() => handleDelete(Book.id)} className="rounded py-1 px-4 ml-2 bg-green-300">Xóa</button>
+                <button onClick={() => handleViewDetail(Book.id)} className="rounded py-1 px-4 ml-2 bg-red-300">Xem chi tiết</button>
               </td>
             </tr>
           ))}
@@ -251,176 +306,268 @@ const Books = () => {
       </table>
 
       {showModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-          <div className="bg-white p-5 rounded shadow-lg w-full max-w-2xl">
-            <h2 className="text-xl font-bold mb-4">{isEditing ? "Chỉnh sửa sách" : "Thêm sách"}</h2>
-            <form onSubmit={handleSubmit} className="grid grid-cols-3 gap-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-full max-h-full">
+            <h2 className="text-2xl font-bold mb-4">{isEditing ? "Chỉnh sửa sách" : "Thêm sách mới"}</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="grid grid-cols-3 gap-4">
+                
               <div>
-                <label className="block text-sm font-medium text-gray-700">Tên sách:</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={newBook.title}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                  required
-                />
+                  <label className="block">Tên sách:</label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={newBook.title}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Tác giả:</label>
+                  <select
+                    name="author"
+                    value={newBook.author}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  >
+                    <option value="">Chọn tác giả</option>
+                    {authors.map(author => (
+                      <option key={author.id} value={author.name}>{author.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block">Chủ đề:</label>
+                  <input
+                    type="text"
+                    name="subject"
+                    value={newBook.subject}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Mô tả:</label>
+                  <input
+                    type="text"
+                    name="description"
+                    value={newBook.description}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Nhà xuất bản:</label>
+                  <select
+                    name="publisher"
+                    value={newBook.publisher}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  >
+                    <option value="">Chọn nhà xuất bản</option>
+                    {publishers.map(publisher => (
+                      <option key={publisher.id} value={publisher.name}>{publisher.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block">Người đóng góp:</label>
+                  <input
+                    type="text"
+                    name="contributor"
+                    value={newBook.contributor}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Ngày phát hành:</label>
+                  <input
+                    type="date"
+                    name="date"
+                    value={newBook.date}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Loại tài liệu:</label>
+                  <input
+                    type="text"
+                    name="type"
+                    value={newBook.type}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Định dạng:</label>
+                  <input
+                    type="text"
+                    name="format"
+                    value={newBook.format}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Mã định danh:</label>
+                  <input
+                    type="text"
+                    name="identifier"
+                    value={newBook.identifier}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Nguồn:</label>
+                  <input
+                    type="text"
+                    name="source"
+                    value={newBook.source}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Ngôn ngữ:</label>
+                  <input
+                    type="text"
+                    name="language"
+                    value={newBook.language}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Mối quan hệ:</label>
+                  <input
+                    type="text"
+                    name="relation"
+                    value={newBook.relation}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Phạm vi:</label>
+                  <input
+                    type="text"
+                    name="coverage"
+                    value={newBook.coverage}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Quyền:</label>
+                  <input
+                    type="text"
+                    name="rights"
+                    value={newBook.rights}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Số trang:</label>
+                  <input
+                    type="number"
+                    name="pageCount"
+                    value={newBook.pageCount}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Số lượng:</label>
+                  <input
+                    type="number"
+                    name="quantity"
+                    value={newBook.quantity}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Tình trạng:</label>
+                  <select
+                    name="status"
+                    value={newBook.status}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  >
+                    <option value="available">Chưa mượn</option>
+                    <option value="borrowed">Đã mượn</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block">Vị trí:</label>
+                  <select
+                    name="location"
+                    value={newBook.location}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  >
+                    <option value="">Chọn kệ</option>
+                    {shelves.map(shelf => (
+                      <option key={shelf.id} value={shelf.name}>{shelf.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block">Thể loại:</label>
+                  <select
+                    name="category"
+                    value={newBook.category}
+                    onChange={handleChange}
+                    className="border w-full px-2 py-1"
+                  >
+                    <option value="">Chọn thể loại</option>
+                    {categories.map(category => (
+                      <option key={category.id} value={category.name}>{category.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block">Hình ảnh bìa:</label>
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Tệp PDF:</label>
+                  <input
+                    type="file"
+                    onChange={handlePdfChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block">Tệp âm thanh:</label>
+                  <input
+                    type="file"
+                    onChange={handleAudioChange}
+                    className="border w-full px-2 py-1"
+                  />
+                </div>
+            
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Tác giả:</label>
-                <input
-                  type="text"
-                  name="author"
-                  value={newBook.author}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Nhà xuất bản:</label>
-                <input
-                  type="text"
-                  name="publisher"
-                  value={newBook.publisher}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Năm xuất bản:</label>
-                <input
-                  type="text"
-                  name="publicationYear"
-                  value={newBook.publicationYear}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">ISBN:</label>
-                <input
-                  type="text"
-                  name="isbn"
-                  value={newBook.isbn}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Ngôn ngữ:</label>
-                <input
-                  type="text"
-                  name="language"
-                  value={newBook.language}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Thể loại:</label>
-                <select
-                  name="genre"
-                  value={newBook.genre}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                  required
-                >
-                  <option value="">Chọn thể loại</option>
-                  {categories.map(category => (
-                    <option key={category.id} value={category.categoryName}>
-                      {category.categoryName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Số trang:</label>
-                <input
-                  type="number"
-                  name="pageCount"
-                  value={newBook.pageCount}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Mô tả:</label>
-                <textarea
-                  name="description"
-                  value={newBook.description}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Số lượng:</label>
-                <input
-                  type="number"
-                  name="quantity"
-                  value={newBook.quantity}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Tình trạng:</label>
-                <select
-                  name="condition"
-                  value={newBook.condition}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                  required
-                >
-                  <option value="">Chọn tình trạng</option>
-                  <option value="Chưa mượn">Chưa mượn</option>
-                  <option value="Đã mượn">Đã mượn</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Vị trí:</label>
-                <select
-                  name="location"
-                  value={newBook.location}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                  required
-                >
-                  <option value="">Chọn kệ sách</option>
-                  {shelves.map(shelf => (
-                    <option key={shelf.id} value={shelf.BookShelfName}>
-                      {shelf.BookShelfName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <label className="block text-sm font-medium text-gray-700">Tải ảnh bìa:</label>
-              <div className="col-span-3 flex justify-end">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-              <label className="block text-sm font-medium text-gray-700">Tải file sách:</label>
-              <div className="col-span-3 flex justify-end">
-                <input type="file" accept="application/pdf" onChange={handlePdfChange} className="mt-1 block w-full p-2 border border-gray-300 rounded"/>
-              </div>
-              <div className="col-span-3 flex justify-end">
-                <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded">
-                  {isEditing ? "Cập nhật sách" : "Lưu"}
+               
+              <div className="mt-4 flex justify-end">
+                <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-green-600">
+                  {isEditing ? "Cập nhật sách" : "Thêm sách"}
                 </button>
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="bg-gray-500 text-white py-2 px-4 rounded ml-2"
-                >
+                <button type="button" onClick={handleCloseModal} className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 ml-2">
                   Hủy
                 </button>
               </div>
+          
             </form>
+            
           </div>
         </div>
       )}

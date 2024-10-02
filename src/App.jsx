@@ -31,7 +31,8 @@ const App = () => {
           <Route path="/shelf" element={<ShelfLocation />} />
           <Route path="/publisher" element={<Publisher />} />
           <Route path="/author" element={<Author/>} />
-          
+      
+        <Route path="/book-detail/:id" element={<BookDetail />} />
         
 
         </Routes>

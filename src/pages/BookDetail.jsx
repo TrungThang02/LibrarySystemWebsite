@@ -1,83 +1,128 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { doc, getDoc } from "firebase/firestore";
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../firebase/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import Swal from 'sweetalert2';
 
-const BookDetail = () => {
+const BookDetails = () => {
   const { id } = useParams();
-  const [book, setBook] = useState(null);
+  const [book, setBook] = useState({
+    title: '',
+    author: '',
+    category: '',
+    publisher: '',
+    description: '',
+    date: '',
+    type: '',
+    format: '',
+    identifier: '',
+    source: '',
+    language: '',
+    relation: '',
+    coverage: '',
+    rights: '',
+    pageCount: '',
+    quantity: '',
+    condition: '',
+    location: '',
+    coverImage: '',
+    pdfUrl: '',
+    status: 'available',
+  });
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchBookDetail = async () => {
+    const fetchBookDetails = async () => {
       try {
-        const docRef = doc(db, 'books', id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setBook(docSnap.data());
+        const bookDoc = doc(db, 'books', id);
+        const bookSnapshot = await getDoc(bookDoc);
+
+        if (bookSnapshot.exists()) {
+          setBook({ id: bookSnapshot.id, ...bookSnapshot.data() });
         } else {
-          console.log("No such document!");
+          Swal.fire('Không tìm thấy sách', 'Sách không tồn tại trong hệ thống.', 'error');
+          navigate('/books');
         }
       } catch (error) {
-        console.error("Error fetching book detail: ", error);
+        console.error('Lỗi khi lấy thông tin sách: ', error);
+        Swal.fire('Có lỗi xảy ra', 'Vui lòng thử lại sau.', 'error');
       }
     };
 
-    fetchBookDetail();
-  }, [id]);
+    fetchBookDetails();
+  }, [id, navigate]);
 
-  if (!book) return <div className="flex justify-center items-center h-screen text-lg font-medium">Đang tải...</div>;
+  if (!book) {
+    return <div className="text-center">Đang tải...</div>;
+  }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto bg-white rounded-lg shadow-md my-10">
-      <h2 className="text-4xl font-bold text-center mb-6 text-gray-800">Thông tin chi tiết sách</h2>
-
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="flex-shrink-0 w-full lg:w-1/3">
-          <img
-            src={book.coverImage}
-            alt={book.title}
-            className="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-300"
-          />
-        </div>
-
-        <div className="flex-grow">
-          <div className="grid grid-cols-1 gap-4 text-gray-700 mb-4">
-            <p><strong className="text-gray-900">Tên sách:</strong> {book.title}</p>
-            <p><strong className="text-gray-900">Tác giả:</strong> {book.author}</p>
-            <p><strong className="text-gray-900">Nhà xuất bản:</strong> {book.publisher}</p>
-            <p><strong className="text-gray-900">Năm xuất bản:</strong> {book.publicationYear}</p>
-            <p><strong className="text-gray-900">ISBN:</strong> {book.isbn}</p>
-            <p><strong className="text-gray-900">Ngôn ngữ:</strong> {book.language}</p>
-            <p><strong className="text-gray-900">Thể loại:</strong> {book.genre}</p>
-            <p><strong className="text-gray-900">Số trang:</strong> {book.pageCount}</p>
-            <p><strong className="text-gray-900">Tình trạng:</strong> {book.condition}</p>
-            <p><strong className="text-gray-900">Số lượng:</strong> {book.quantity}</p>
-            <p><strong className="text-gray-900">Vị trí:</strong> {book.location}</p>
-          </div>
-
-          <div className="mt-4 bg-gray-100 p-4 rounded-lg shadow-inner">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-2">Mô tả:</h3>
-            <p className="text-gray-600 leading-relaxed">{book.description}</p>
-          </div>
-        </div>
-      </div>
-
-      {book.pdfUrl && (
-        <div className="mt-8">
-          <h3 className="text-2xl font-semibold text-gray-800 mb-4">Xem sách PDF:</h3>
-          <div className="border border-gray-300 rounded-lg overflow-hidden shadow-md">
-            <iframe 
-              src={book.pdfUrl} 
-              width="100%" 
-              height="500" 
-              className="border-none"
-              title="PDF Viewer"
+    <div className="container mx-auto p-6">
+     
+      <div className="bg-white p-6">
+      <h2 className="text-3xl font-bold mb-6 text-center">Thông tin chi tiết về sách: {book.title || 'Chưa có tiêu đề'}</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <img
+              src={book.coverImage || 'default_cover_image.jpg'}
+              alt={book.title || 'Chưa có tiêu đề'}
+              className="w-full h-auto rounded-md shadow-md"
             />
           </div>
+          <div>
+            <h3 className="text-2xl font-semibold mb-2">{book.title || 'Chưa có tiêu đề'}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-lg mb-1"><strong>Tác giả:</strong> {book.author || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1"><strong>Nhà xuất bản:</strong> {book.publisher || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1"><strong>Thể loại:</strong> {book.category || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1"><strong>Ngôn ngữ:</strong> {book.language || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1"><strong>Số trang:</strong> {book.pageCount || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1"><strong>Tình trạng:</strong> {book.status === 'available' ? 'Chưa mượn' : 'Đã mượn'}</p>
+                <p className="text-lg mb-1"><strong>Số lượng:</strong> {book.quantity || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1"><strong>Vị trí:</strong> {book.location || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1"><strong>Loại:</strong> {book.type || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1"><strong>Định dạng:</strong> {book.format || 'Chưa có thông tin'}</p>
+              </div>
+              <div>
+                <p className="text-lg mb-1"><strong>Ngày phát hành:</strong> {book.date || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1"><strong>Identifier:</strong> {book.identifier || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1"><strong>Source:</strong> {book.source || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1"><strong>Relation:</strong> {book.relation || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1"><strong>Coverage:</strong> {book.coverage || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1"><strong>Rights:</strong> {book.rights || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1"><strong>Tình trạng sách:</strong> {book.condition || 'Chưa có thông tin'}</p>
+              </div>
+            </div>
+            <p className="text-lg mt-4"><strong>Mô tả:</strong> {book.description || 'Chưa có mô tả'}</p>
+          </div>
         </div>
-      )}
+        <div className="mt-6">
+        <h3 className="text-2xl font-bold mb-2">Xem PDF</h3>
+        {book.pdfUrl ? (
+          <iframe
+            src={book.pdfUrl}
+            title="PDF Viewer"
+            className="w-full h-screen border border-gray-300 rounded-lg shadow-md"
+          ></iframe>
+        ) : (
+          <p>Không có PDF để xem.</p>
+        )}
+      </div>
+      <div className="mt-6 text-center">
+        <button
+          onClick={() => navigate('/books')}
+          className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
+        >
+          Quay lại danh sách sách
+        </button>
+      </div>
+      </div>
+
+      
+     
     </div>
   );
 };
 
-export default BookDetail;
+export default BookDetails;
