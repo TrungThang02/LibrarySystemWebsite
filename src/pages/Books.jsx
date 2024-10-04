@@ -306,9 +306,9 @@ const Books = () => {
       </table>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg w-full max-w-full max-h-full">
-            <h2 className="text-2xl font-bold mb-4">{isEditing ? "Chỉnh sửa sách" : "Thêm sách mới"}</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
+          <div className="bg-white p-3 rounded shadow-lg w-full max-w-full max-h-full">
+            <h2 className="text-2xl font-bold mb-2">{isEditing ? "Chỉnh sửa sách" : "Thêm sách mới"}</h2>
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-3 gap-4">
                 
@@ -328,7 +328,7 @@ const Books = () => {
                     name="author"
                     value={newBook.author}
                     onChange={handleChange}
-                    className="border w-full px-2 py-1"
+                    className="border w-full px-2 py-1 bg-slate-200"
                   >
                     <option value="">Chọn tác giả</option>
                     {authors.map(author => (
@@ -362,7 +362,7 @@ const Books = () => {
                     name="publisher"
                     value={newBook.publisher}
                     onChange={handleChange}
-                    className="border w-full px-2 py-1"
+                    className="border w-full px-2 py-1 bg-slate-200"
                   >
                     <option value="">Chọn nhà xuất bản</option>
                     {publishers.map(publisher => (
@@ -411,7 +411,7 @@ const Books = () => {
                   />
                 </div>
                 <div>
-                  <label className="block">Mã định danh:</label>
+                  <label className="block">Mã định danh (ISBN):</label>
                   <input
                     type="text"
                     name="identifier"
@@ -496,7 +496,7 @@ const Books = () => {
                     name="status"
                     value={newBook.status}
                     onChange={handleChange}
-                    className="border w-full px-2 py-1"
+                    className="border w-full px-2 py-1 bg-slate-200"
                   >
                     <option value="available">Chưa mượn</option>
                     <option value="borrowed">Đã mượn</option>
@@ -508,7 +508,7 @@ const Books = () => {
                     name="location"
                     value={newBook.location}
                     onChange={handleChange}
-                    className="border w-full px-2 py-1"
+                    className="border w-full px-2 py-1 bg-slate-200"
                   >
                     <option value="">Chọn kệ</option>
                     {shelves.map(shelf => (
@@ -522,7 +522,7 @@ const Books = () => {
                     name="category"
                     value={newBook.category}
                     onChange={handleChange}
-                    className="border w-full px-2 py-1"
+                    className="border w-full px-2 py-1 bg-slate-200"
                   >
                     <option value="">Chọn thể loại</option>
                     {categories.map(category => (
