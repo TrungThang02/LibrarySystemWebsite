@@ -14,7 +14,8 @@ import {
     FaFolder,
     FaExchangeAlt,
     FaBook,
-    FaListAlt
+    FaListAlt,
+    FaHome
     
 }from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
@@ -27,6 +28,11 @@ const Sidebar = ({children}) => {
 
    
     const menuItem=[
+        {
+            path:"/home",
+            name:"Trang tổng quan",
+            icon:<FaHome />
+        },
         {
             path:"/",
             name:"Quản lý danh mục sách",

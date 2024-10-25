@@ -92,7 +92,10 @@ const BookDetails = () => {
                 <p className="text-lg mb-1"><strong>Phạm vi:</strong> {book.coverage || 'Chưa có thông tin'}</p>
                 <p className="text-lg mb-1"><strong>Quyền:</strong> {book.rights || 'Chưa có thông tin'}</p>
 
-                <p className="text-lg mb-1"><strong>Tình trạng sách:</strong> {book.condition || 'Chưa có thông tin'}</p>
+                <p className="text-lg mb-1">
+                  <strong>Tình trạng sách:</strong> {book.condition === 'borrowed' ? 'Đã mượn' : (book.condition || 'Chưa có thông tin')}
+                </p>
+
               </div>
             </div>
             <p className="text-lg mt-4"><strong>Mô tả:</strong> {book.description || 'Chưa có mô tả'}</p>

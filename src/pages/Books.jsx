@@ -493,7 +493,7 @@ const Books = () => {
                 <div>
                   <label className="block">Tình trạng:</label>
                   <select
-                    name="status"
+                    name="condition"
                     value={newBook.status}
                     onChange={handleChange}
                     className="border w-full px-2 py-1 bg-slate-200"

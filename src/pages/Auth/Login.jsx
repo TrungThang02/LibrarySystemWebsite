@@ -23,15 +23,15 @@ const Login = () => {
 
     return (
         <div
-            className="flex items-center justify-center h-screen bg-cover bg-center bg-black"
+            className="flex items-center justify-center h-screen bg-cover bg-center bgr"
            
         >
-            <div className="w-full max-w-md bg-white p-8 rounded shadow-md">
+            <div className="w-full max-w-md bg-white p-8 rounded blur-background form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2 className="text-center text-2xl font-bold mb-4">Đăng Nhập Hệ Thống</h2>
+                    <h2 className="text-center text-2xl font-bold mb-4 text-white">ĐĂNG NHẬP HỆ THỐNG</h2>
                     {error && <p className="text-red-500 text-xs italic mb-4">{error}</p>}
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                        <label className="block text-white text-sm font-bold mb-2" htmlFor="email">
                             Email
                         </label>
                         <input
@@ -44,7 +44,7 @@ const Login = () => {
                         />
                     </div>
                     <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                        <label className="block text-white text-sm font-bold mb-2" htmlFor="password">
                             Mật Khẩu
                         </label>
                         <input
