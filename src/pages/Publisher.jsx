@@ -166,62 +166,70 @@ const Publisher = () => {
 
             {showModal && (
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-                    <div className="bg-white p-4 rounded shadow-lg w-full max-w-xl md:max-w-xs lg:max-w-xs">
+                    <div className="bg-white p-4 rounded shadow-lg w-full max-w-xl md:max-w-xs lg:max-w-xl">
                         <h2 className="text-xl font-bold mb-4">{isEditing ? "Chỉnh sửa nhà xuất bản" : "Thêm nhà xuất bản"}</h2>
-                        <div className="mb-4">
-                            <input
-                                type="text"
-                                name="PublisherName"
-                                placeholder="Nhập tên nhà xuất bản"
-                                value={newPublisher.PublisherName}
-                                onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded"
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="mb-4">
+                                <label htmlFor="PublisherName" className="block mb-2">Tên nhà xuất bản</label>
+                                <input
+                                    type="text"
+                                    name="PublisherName"
+                                    placeholder="Nhập tên nhà xuất bản"
+                                    value={newPublisher.PublisherName}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="phoneNumber" className="block mb-2">Số điện thoại</label>
+                                <input
+                                    type="text"
+                                    name="phoneNumber"
+                                    placeholder="Nhập số điện thoại"
+                                    value={newPublisher.phoneNumber}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="email" className="block mb-2">Email</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    placeholder="Nhập email"
+                                    value={newPublisher.email}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="address" className="block mb-2">Địa chỉ</label>
+                                <input
+                                    type="text"
+                                    name="address"
+                                    placeholder="Nhập địa chỉ"
+                                    value={newPublisher.address}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="website" className="block mb-2">Website</label>
+                                <input
+                                    type="text"
+                                    name="website"
+                                    placeholder="Nhập website"
+                                    value={newPublisher.website}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded"
+                                />
+                            </div>
                         </div>
-                        <div className="mb-4">
-                            <input
-                                type="text"
-                                name="phoneNumber"
-                                placeholder="Nhập số điện thoại"
-                                value={newPublisher.phoneNumber}
-                                onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="Nhập email"
-                                value={newPublisher.email}
-                                onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <input
-                                type="text"
-                                name="address"
-                                placeholder="Nhập địa chỉ"
-                                value={newPublisher.address}
-                                onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <input
-                                type="text"
-                                name="website"
-                                placeholder="Nhập website"
-                                value={newPublisher.website}
-                                onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div className="flex justify-end">
+
+                        <div className="flex justify-end gap-2 mt-4">
                             <button
                                 onClick={handleCloseModal}
-                                className="bg-gray-500 text-white py-2 px-4 rounded mr-2"
+                                className="bg-gray-500 text-white py-2 px-4 rounded"
                             >
                                 Hủy
                             </button>

@@ -150,6 +150,7 @@ const BookCategory = () => {
           <div className={`bg-white p-4 rounded shadow-lg w-full max-w-xl modal ${showModal ? 'show' : ''}`}>
             <h2 className="text-xl font-bold mb-4">{isEditing ? "Chỉnh sửa danh mục" : "Thêm danh mục"}</h2>
             <div className="mb-4">
+            <label htmlFor="address" className="block mb-2">Tên danh mục sách</label>
               <input
                 type="text"
                 name="categoryName"

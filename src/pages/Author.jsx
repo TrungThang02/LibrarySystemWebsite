@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 
 const Author = () => {
     const [Authors, setAuthors] = useState([]);
+    const [publishers, setPublishers] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [currentAuthorId, setCurrentAuthorId] = useState(null);
@@ -13,7 +14,8 @@ const Author = () => {
         phoneNumber: '',
         email: '',
         degree: '',
-        basicInfo: ''
+        basicInfo: '',
+        publisherId: '', // New field to store selected publisher ID
     });
 
     useEffect(() => {
@@ -31,19 +33,35 @@ const Author = () => {
             }
         };
 
+        const fetchPublishers = async () => {
+            try {
+                const publishersCollection = collection(db, 'publisher');
+                const publisherSnapshot = await getDocs(publishersCollection);
+                const publisherList = publisherSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    name: doc.data().PublisherName,
+                }));
+                setPublishers(publisherList);
+            } catch (error) {
+                console.error("Error fetching publishers: ", error);
+            }
+        };
+
         fetchAuthors();
+        fetchPublishers();
     }, []);
 
-    const handleOpenModal = () => setShowModal(true); // Open modal
+    const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => {
-        setShowModal(false); // Close modal
+        setShowModal(false);
         setIsEditing(false);
         setNewAuthor({
             authorName: '',
             phoneNumber: '',
             email: '',
             degree: '',
-            basicInfo: ''
+            basicInfo: '',
+            publisherId: '',
         });
     };
 
@@ -58,14 +76,12 @@ const Author = () => {
     const handleSave = async () => {
         try {
             if (isEditing && currentAuthorId) {
-                // Update document in Firestore
                 const authorRef = doc(db, 'author', currentAuthorId);
                 await updateDoc(authorRef, newAuthor);
                 setAuthors(prev => prev.map(author =>
                     author.id === currentAuthorId ? { ...author, ...newAuthor } : author
                 ));
             } else {
-                // Add new document to Firestore
                 const authorsCollection = collection(db, 'author');
                 const docRef = await addDoc(authorsCollection, newAuthor);
                 setAuthors([...Authors, { id: docRef.id, ...newAuthor }]);
@@ -83,7 +99,8 @@ const Author = () => {
             phoneNumber: author.phoneNumber,
             email: author.email,
             degree: author.degree,
-            basicInfo: author.basicInfo
+            basicInfo: author.basicInfo,
+            publisherId: author.publisherId || '', // Ensure to pass publisherId
         });
         setCurrentAuthorId(author.id);
         setIsEditing(true);
@@ -122,7 +139,7 @@ const Author = () => {
             <h2 className="text-2xl font-bold mb-4">Quản lý tác giả</h2>
             <button
                 className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-green-600 mb-4"
-                onClick={handleOpenModal} // Open modal
+                onClick={handleOpenModal}
             >
                 Thêm tác giả
             </button>
@@ -134,6 +151,7 @@ const Author = () => {
                         <th className="py-2 px-4 border-r">Email</th>
                         <th className="py-2 px-4 border-r">Bằng cấp</th>
                         <th className="py-2 px-4 border-r">Thông tin cơ bản</th>
+                        <th className="py-2 px-4 border-r">Nhà xuất bản</th>
                         <th className="py-2 px-4"></th>
                     </tr>
                 </thead>
@@ -145,6 +163,11 @@ const Author = () => {
                             <td className="py-2 px-4 border-r">{author.email}</td>
                             <td className="py-2 px-4 border-r">{author.degree}</td>
                             <td className="py-2 px-4 border-r">{author.basicInfo}</td>
+                            <td className="py-2 px-4 border-r">
+                                {
+                                    publishers.find(publisher => publisher.id === author.publisherId)?.name || 'Không có nhà xuất bản'
+                                }
+                            </td>
                             <td className="py-2 px-4 flex gap-2">
                                 <button
                                     className="bg-yellow-500 text-white py-1 px-2 rounded"
@@ -166,69 +189,105 @@ const Author = () => {
 
             {showModal && (
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-                    <div className="bg-white p-4 rounded shadow-lg w-full max-w-xl md:max-w-xs lg:max-w-xs">
+                    <div className="bg-white p-4 rounded shadow-lg w-full max-w-xl md:max-w-xl lg:max-w-xl">
                         <h2 className="text-xl font-bold mb-4">{isEditing ? "Chỉnh sửa tác giả" : "Thêm tác giả"}</h2>
-                        <div className="mb-4">
-                            <input
-                                type="text"
-                                name="authorName"
-                                placeholder="Nhập tên tác giả"
-                                value={newAuthor.authorName}
-                                onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded"
-                            />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="mb-4">
+                                <label htmlFor="authorName" className="block mb-2">Tên tác giả</label>
+                                <input
+                                    type="text"
+                                    id="authorName"
+                                    name="authorName"
+                                    placeholder="Nhập tên tác giả"
+                                    value={newAuthor.authorName}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded"
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <label htmlFor="phoneNumber" className="block mb-2">Số điện thoại</label>
+                                <input
+                                    type="text"
+                                    id="phoneNumber"
+                                    name="phoneNumber"
+                                    placeholder="Nhập số điện thoại"
+                                    value={newAuthor.phoneNumber}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded"
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <label htmlFor="email" className="block mb-2">Email</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    placeholder="Nhập email"
+                                    value={newAuthor.email}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded"
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <label htmlFor="degree" className="block mb-2">Bằng cấp</label>
+                                <input
+                                    type="text"
+                                    id="degree"
+                                    name="degree"
+                                    placeholder="Nhập bằng cấp"
+                                    value={newAuthor.degree}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded"
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <label htmlFor="basicInfo" className="block mb-2">Thông tin cơ bản</label>
+                                <input
+                                    id="basicInfo"
+                                    name="basicInfo"
+                                    placeholder="Nhập thông tin cơ bản"
+                                    value={newAuthor.basicInfo}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded"
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <label htmlFor="publisherId" className="block mb-2">Nhà xuất bản</label>
+                                <select
+                                    id="publisherId"
+                                    name="publisherId"
+                                    value={newAuthor.publisherId || ''}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded"
+                                >
+                                    <option value="">Chọn nhà xuất bản</option>
+                                    {publishers.map(publisher => (
+                                        <option key={publisher.id} value={publisher.id}>
+                                            {publisher.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
-                        <div className="mb-4">
-                            <input
-                                type="text"
-                                name="phoneNumber"
-                                placeholder="Nhập số điện thoại"
-                                value={newAuthor.phoneNumber}
-                                onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="Nhập email"
-                                value={newAuthor.email}
-                                onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <input
-                                type="text"
-                                name="degree"
-                                placeholder="Nhập bằng cấp"
-                                value={newAuthor.degree}
-                                onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <textarea
-                                name="basicInfo"
-                                placeholder="Nhập thông tin cơ bản"
-                                value={newAuthor.basicInfo}
-                                onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div className="flex justify-end">
+
+                        <div className="flex justify-end gap-2 mt-4">
                             <button
+                                className="bg-gray-300 text-black py-2 px-4 rounded"
                                 onClick={handleCloseModal}
-                                className="bg-gray-500 text-white py-2 px-4 rounded mr-2"
                             >
                                 Hủy
                             </button>
                             <button
-                                onClick={handleSave}
                                 className="bg-blue-500 text-white py-2 px-4 rounded"
+                                onClick={handleSave}
                             >
-                                {isEditing ? "Cập nhật tác giả" : "Lưu"}
+                                {isEditing ? 'Cập nhật' : 'Lưu'}
                             </button>
                         </div>
                     </div>
