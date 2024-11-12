@@ -29,12 +29,12 @@ const Sidebar = ({children}) => {
    
     const menuItem=[
         {
-            path:"/home",
+            path:"/",
             name:"Trang tổng quan",
             icon:<FaHome />
         },
         {
-            path:"/",
+            path:"/category",
             name:"Quản lý danh mục sách",
             icon:<FaListAlt />
         },
