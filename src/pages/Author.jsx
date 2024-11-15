@@ -15,7 +15,7 @@ const Author = () => {
         email: '',
         degree: '',
         basicInfo: '',
-        publisherId: '', // New field to store selected publisher ID
+        publisherId: '',
     });
 
     useEffect(() => {
@@ -100,7 +100,7 @@ const Author = () => {
             email: author.email,
             degree: author.degree,
             basicInfo: author.basicInfo,
-            publisherId: author.publisherId || '', // Ensure to pass publisherId
+            publisherId: author.publisherId || '',
         });
         setCurrentAuthorId(author.id);
         setIsEditing(true);
@@ -123,11 +123,7 @@ const Author = () => {
             try {
                 await deleteDoc(doc(db, 'author', id));
                 setAuthors(Authors.filter(author => author.id !== id));
-                Swal.fire(
-                    'Đã xóa!',
-                    'Tác giả đã được xóa.',
-                    'success'
-                );
+                Swal.fire('Đã xóa!', 'Tác giả đã được xóa.', 'success');
             } catch (error) {
                 console.error("Error deleting author: ", error);
             }
@@ -135,160 +131,146 @@ const Author = () => {
     };
 
     return (
-        <div className="mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">Quản lý tác giả</h2>
+        <div className="container mt-5">
+            <h2 className="h2">Quản lý tác giả</h2>
             <button
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-green-600 mb-4"
+                className="btn btn-primary mb-3"
                 onClick={handleOpenModal}
             >
                 Thêm tác giả
             </button>
-            <table className="min-w-full bg-white border border-gray-300">
-                <thead>
-                    <tr className="w-full bg-gray-100 border-b">
-                        <th className="py-2 px-4 border-r">Tên tác giả</th>
-                        <th className="py-2 px-4 border-r">Số điện thoại</th>
-                        <th className="py-2 px-4 border-r">Email</th>
-                        <th className="py-2 px-4 border-r">Bằng cấp</th>
-                        <th className="py-2 px-4 border-r">Thông tin cơ bản</th>
-                        <th className="py-2 px-4 border-r">Nhà xuất bản</th>
-                        <th className="py-2 px-4"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {Authors.map(author => (
-                        <tr key={author.id} className="border-b hover:bg-gray-50">
-                            <td className="py-2 px-4 border-r">{author.authorName}</td>
-                            <td className="py-2 px-4 border-r">{author.phoneNumber}</td>
-                            <td className="py-2 px-4 border-r">{author.email}</td>
-                            <td className="py-2 px-4 border-r">{author.degree}</td>
-                            <td className="py-2 px-4 border-r">{author.basicInfo}</td>
-                            <td className="py-2 px-4 border-r">
-                                {
-                                    publishers.find(publisher => publisher.id === author.publisherId)?.name || 'Không có nhà xuất bản'
-                                }
-                            </td>
-                            <td className="py-2 px-4 flex gap-2">
-                                <button
-                                    className="bg-yellow-500 text-white py-1 px-2 rounded"
-                                    onClick={() => handleEdit(author)}
-                                >
-                                    Sửa
-                                </button>
-                                <button
-                                    className="bg-red-500 text-white py-1 px-2 rounded"
-                                    onClick={() => handleDelete(author.id)}
-                                >
-                                    Xóa
-                                </button>
-                            </td>
+            <div className="table-responsive">
+                <table className="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Tên tác giả</th>
+                            <th>Số điện thoại</th>
+                            <th>Email</th>
+                            <th>Bằng cấp</th>
+                            <th>Thông tin cơ bản</th>
+                            <th>Nhà xuất bản</th>
+                            <th>Hành động</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {Authors.map(author => (
+                            <tr key={author.id}>
+                                <td>{author.authorName}</td>
+                                <td>{author.phoneNumber}</td>
+                                <td>{author.email}</td>
+                                <td>{author.degree}</td>
+                                <td>{author.basicInfo}</td>
+                                <td>
+                                    {
+                                        publishers.find(publisher => publisher.id === author.publisherId)?.name || 'Không có nhà xuất bản'
+                                    }
+                                </td>
+                                <td>
+                                    <button
+                                        className="btn btn-warning btn-sm me-2"
+                                        onClick={() => handleEdit(author)}
+                                    >
+                                        Sửa
+                                    </button>
+                                    <button
+                                        className="btn btn-danger btn-sm"
+                                        onClick={() => handleDelete(author.id)}
+                                    >
+                                        Xóa
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
             {showModal && (
-                <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-                    <div className="bg-white p-4 rounded shadow-lg w-full max-w-xl md:max-w-xl lg:max-w-xl">
-                        <h2 className="text-xl font-bold mb-4">{isEditing ? "Chỉnh sửa tác giả" : "Thêm tác giả"}</h2>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="mb-4">
-                                <label htmlFor="authorName" className="block mb-2">Tên tác giả</label>
-                                <input
-                                    type="text"
-                                    id="authorName"
-                                    name="authorName"
-                                    placeholder="Nhập tên tác giả"
-                                    value={newAuthor.authorName}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border border-gray-300 rounded"
-                                />
+                <div className="modal fade show" tabIndex="-1" style={{ display: 'block' }} aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title" id="exampleModalLabel">{isEditing ? "Chỉnh sửa tác giả" : "Thêm tác giả"}</h5>
+                                <button type="button" className="btn-close" data-bs-dismiss="modal" onClick={handleCloseModal} aria-label="Close"></button>
                             </div>
-
-                            <div className="mb-4">
-                                <label htmlFor="phoneNumber" className="block mb-2">Số điện thoại</label>
-                                <input
-                                    type="text"
-                                    id="phoneNumber"
-                                    name="phoneNumber"
-                                    placeholder="Nhập số điện thoại"
-                                    value={newAuthor.phoneNumber}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border border-gray-300 rounded"
-                                />
+                            <div className="modal-body">
+                                <div className="mb-3">
+                                    <label htmlFor="authorName" className="form-label">Tên tác giả</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="authorName"
+                                        name="authorName"
+                                        value={newAuthor.authorName}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="phoneNumber" className="form-label">Số điện thoại</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="phoneNumber"
+                                        name="phoneNumber"
+                                        value={newAuthor.phoneNumber}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="email" className="form-label">Email</label>
+                                    <input
+                                        type="email"
+                                        className="form-control"
+                                        id="email"
+                                        name="email"
+                                        value={newAuthor.email}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="degree" className="form-label">Bằng cấp</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="degree"
+                                        name="degree"
+                                        value={newAuthor.degree}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="basicInfo" className="form-label">Thông tin cơ bản</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="basicInfo"
+                                        name="basicInfo"
+                                        value={newAuthor.basicInfo}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="publisherId" className="form-label">Nhà xuất bản</label>
+                                    <select
+                                        className="form-select"
+                                        id="publisherId"
+                                        name="publisherId"
+                                        value={newAuthor.publisherId || ''}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">Chọn nhà xuất bản</option>
+                                        {publishers.map(publisher => (
+                                            <option key={publisher.id} value={publisher.id}>
+                                                {publisher.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
-
-                            <div className="mb-4">
-                                <label htmlFor="email" className="block mb-2">Email</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    placeholder="Nhập email"
-                                    value={newAuthor.email}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border border-gray-300 rounded"
-                                />
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>Hủy</button>
+                                <button type="button" className="btn btn-primary" onClick={handleSave}>{isEditing ? 'Cập nhật' : 'Lưu'}</button>
                             </div>
-
-                            <div className="mb-4">
-                                <label htmlFor="degree" className="block mb-2">Bằng cấp</label>
-                                <input
-                                    type="text"
-                                    id="degree"
-                                    name="degree"
-                                    placeholder="Nhập bằng cấp"
-                                    value={newAuthor.degree}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border border-gray-300 rounded"
-                                />
-                            </div>
-
-                            <div className="mb-4">
-                                <label htmlFor="basicInfo" className="block mb-2">Thông tin cơ bản</label>
-                                <input
-                                    id="basicInfo"
-                                    name="basicInfo"
-                                    placeholder="Nhập thông tin cơ bản"
-                                    value={newAuthor.basicInfo}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border border-gray-300 rounded"
-                                />
-                            </div>
-
-                            <div className="mb-4">
-                                <label htmlFor="publisherId" className="block mb-2">Nhà xuất bản</label>
-                                <select
-                                    id="publisherId"
-                                    name="publisherId"
-                                    value={newAuthor.publisherId || ''}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border border-gray-300 rounded"
-                                >
-                                    <option value="">Chọn nhà xuất bản</option>
-                                    {publishers.map(publisher => (
-                                        <option key={publisher.id} value={publisher.id}>
-                                            {publisher.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="flex justify-end gap-2 mt-4">
-                            <button
-                                className="bg-gray-300 text-black py-2 px-4 rounded"
-                                onClick={handleCloseModal}
-                            >
-                                Hủy
-                            </button>
-                            <button
-                                className="bg-blue-500 text-white py-2 px-4 rounded"
-                                onClick={handleSave}
-                            >
-                                {isEditing ? 'Cập nhật' : 'Lưu'}
-                            </button>
                         </div>
                     </div>
                 </div>

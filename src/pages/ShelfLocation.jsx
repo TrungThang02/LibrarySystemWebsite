@@ -103,33 +103,34 @@ const ShelfLocation = () => {
     <div className="mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Quản lý kệ sách</h2>
       <button
-        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-green-600 mb-4"
+        className="btn btn-primary mb-4"
         onClick={handleOpenModal} // Open modal
       >
         Thêm kệ sách
       </button>
-      <table className="min-w-full bg-white border border-gray-300">
+
+      <table className="table table-bordered table-striped mt-4">
         <thead>
-          <tr className="w-full bg-gray-100 border-b">
-            <th className="py-2 px-4 border-r">Tên kệ sách</th>
-            <th className="py-2 px-4 border-r">Số lượng</th>
-            <th className="py-2 px-4"></th>
+          <tr>
+            <th>Tên kệ sách</th>
+            <th>Số lượng</th>
+            <th>Thao tác</th>
           </tr>
         </thead>
         <tbody>
           {BookShelfs.map(BookShelf => (
-            <tr key={BookShelf.id} className="border-b hover:bg-gray-50">
-              <td className="py-2 px-4 border-r">{BookShelf.BookShelfName}</td>
-              <td className="py-2 px-4 border-r">{BookShelf.Quantity}</td>
-              <td className="py-2 px-4 flex gap-2">
+            <tr key={BookShelf.id}>
+              <td>{BookShelf.BookShelfName}</td>
+              <td>{BookShelf.Quantity}</td>
+              <td className="text-center">
                 <button
-                  className="bg-yellow-500 text-white py-1 px-2 rounded"
+                  className="btn btn-warning me-2"
                   onClick={() => handleEdit(BookShelf)}
                 >
                   Sửa
                 </button>
                 <button
-                  className="bg-red-500 text-white py-1 px-2 rounded"
+                  className="btn btn-danger"
                   onClick={() => handleDelete(BookShelf.id)}
                 >
                   Xóa
@@ -141,46 +142,43 @@ const ShelfLocation = () => {
       </table>
 
       {showModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-          <div className="bg-white p-4 rounded shadow-lg w-full max-w-xl md:max-w-xs lg:max-w-xl">
-            <h2 className="text-xl font-bold mb-4">{isEditing ? "Chỉnh sửa kệ sách" : "Thêm kệ sách"}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-1 gap-1">
-              <div className="mb-4">
-                <label htmlFor="BookShelfName" className="block mb-2">Tên kệ sách</label>
-                <input
-                  type="text"
-                  name="BookShelfName"
-                  placeholder="Nhập tên kệ sách"
-                  value={newBookShelf.BookShelfName}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded"
-                />
+        <div className="modal fade show d-block" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">{isEditing ? "Chỉnh sửa kệ sách" : "Thêm kệ sách"}</h5>
+                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleCloseModal}></button>
               </div>
-              <div className="mb-4">
-                <label htmlFor="Quantity" className="block mb-2">Số lượng</label>
-                <input
-                  type="number"
-                  name="Quantity"
-                  placeholder="Nhập số lượng"
-                  value={newBookShelf.Quantity}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded"
-                />
+              <div className="modal-body">
+                <div className="mb-3">
+                  <label htmlFor="BookShelfName" className="form-label">Tên kệ sách</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="BookShelfName"
+                    name="BookShelfName"
+                    value={newBookShelf.BookShelfName}
+                    onChange={handleChange}
+                    placeholder="Nhập tên kệ sách"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="Quantity" className="form-label">Số lượng</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    id="Quantity"
+                    name="Quantity"
+                    value={newBookShelf.Quantity}
+                    onChange={handleChange}
+                    placeholder="Nhập số lượng"
+                  />
+                </div>
               </div>
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={handleCloseModal}
-                className="bg-gray-500 text-white py-2 px-4 rounded"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleSave}
-                className="bg-blue-500 text-white py-2 px-4 rounded"
-              >
-                {isEditing ? "Cập nhật kệ" : "Lưu"}
-              </button>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>Hủy</button>
+                <button type="button" className="btn btn-primary" onClick={handleSave}>{isEditing ? "Cập nhật kệ" : "Lưu"}</button>
+              </div>
             </div>
           </div>
         </div>

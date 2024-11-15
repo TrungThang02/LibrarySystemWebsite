@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebase/firebase';
 import { collection, getDocs, addDoc, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import Swal from 'sweetalert2';
-import "../assets/modal.css";
 
 const BookCategory = () => {
   const [bookCategories, setBookCategories] = useState([]);
@@ -12,6 +11,7 @@ const BookCategory = () => {
   const [newBookCategory, setNewBookCategory] = useState({ categoryName: '' });
   const [loading, setLoading] = useState(false); // Loading state
 
+  // Fetching categories from Firestore
   useEffect(() => {
     const fetchBookCategories = async () => {
       try {
@@ -45,6 +45,7 @@ const BookCategory = () => {
     }));
   };
 
+  // Handle saving the category
   const handleSave = async () => {
     if (!newBookCategory.categoryName.trim()) {
       Swal.fire('Lỗi', 'Tên danh mục không được để trống!', 'error');
@@ -54,14 +55,14 @@ const BookCategory = () => {
     setLoading(true);
     try {
       if (isEditing && currentBookCategoryId) {
-        // Update document in Firestore
+        // Update existing category
         const bookCategoryRef = doc(db, 'category', currentBookCategoryId);
         await updateDoc(bookCategoryRef, newBookCategory);
         setBookCategories(prev => prev.map(bookCategory =>
           bookCategory.id === currentBookCategoryId ? { ...bookCategory, ...newBookCategory } : bookCategory
         ));
       } else {
-        // Add new document to Firestore
+        // Add new category
         const bookCategoriesCollection = collection(db, 'category');
         const docRef = await addDoc(bookCategoriesCollection, newBookCategory);
         setBookCategories([...bookCategories, { id: docRef.id, ...newBookCategory }]);
@@ -76,6 +77,7 @@ const BookCategory = () => {
     }
   };
 
+  // Open modal for editing a category
   const handleEdit = (bookCategory) => {
     setNewBookCategory({ categoryName: bookCategory.categoryName });
     setCurrentBookCategoryId(bookCategory.id);
@@ -83,6 +85,7 @@ const BookCategory = () => {
     handleOpenModal();
   };
 
+  // Handle category deletion
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: 'Xóa Danh mục?',
@@ -107,34 +110,34 @@ const BookCategory = () => {
   };
 
   return (
-    <div className="mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Danh mục</h2>
+    <div className="container mt-5">
+      <h2 className="h2">Danh mục</h2>
       <button
-        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-green-600 mb-4"
+        className="btn btn-primary mb-4"
         onClick={handleOpenModal}
       >
         Thêm Danh mục
       </button>
-      <table className="min-w-full bg-white border border-gray-300">
+      <table className="table table-striped table-hover">
         <thead>
-          <tr className="w-full bg-gray-100 border-b">
-            <th className="py-2 px-4 border-r">Tên danh mục sách</th>
-            <th className="py-2 px-4"></th>
+          <tr>
+            <th>Tên danh mục sách</th>
+            <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
           {bookCategories.map(bookCategory => (
-            <tr key={bookCategory.id} className="border-b hover:bg-gray-50">
-              <td className="py-2 px-4 border-r">{bookCategory.categoryName}</td>
-              <td className="py-2 px-4 flex gap-2">
+            <tr key={bookCategory.id}>
+              <td>{bookCategory.categoryName}</td>
+              <td>
                 <button
-                  className="bg-yellow-500 text-white py-1 px-2 rounded"
+                  className="btn btn-warning mr-2"
                   onClick={() => handleEdit(bookCategory)}
                 >
                   Sửa
                 </button>
                 <button
-                  className="bg-red-500 text-white py-1 px-2 rounded"
+                  className="btn btn-danger"
                   onClick={() => handleDelete(bookCategory.id)}
                 >
                   Xóa
@@ -145,32 +148,34 @@ const BookCategory = () => {
         </tbody>
       </table>
 
+      {/* Modal for adding/editing categories */}
       {showModal && (
-        <div className={`fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center modal-overlay ${showModal ? 'show' : ''}`}>
-          <div className={`bg-white p-4 rounded shadow-lg w-full max-w-xl modal ${showModal ? 'show' : ''}`}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <h2 className="text-xl font-bold mb-4">{isEditing ? "Chỉnh sửa danh mục" : "Thêm danh mục"}</h2>
             <div className="mb-4">
-            <label htmlFor="address" className="block mb-2">Tên danh mục sách</label>
+              <label htmlFor="categoryName" className="block text-sm font-medium text-gray-700">Tên danh mục sách</label>
               <input
                 type="text"
+                className="w-full p-2 border border-gray-300 rounded mt-1"
+                id="categoryName"
                 name="categoryName"
                 placeholder="Nhập tên danh mục sách"
                 value={newBookCategory.categoryName}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
               />
             </div>
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
               <button
+                className="bg-gray-500 text-white py-2 px-4 rounded"
                 onClick={handleCloseModal}
-                className="bg-gray-500 text-white py-2 px-4 rounded mr-2"
               >
                 Hủy
               </button>
               <button
-                onClick={handleSave}
                 className={`bg-blue-500 text-white py-2 px-4 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={loading} 
+                onClick={handleSave}
+                disabled={loading}
               >
                 {loading ? "Đang lưu..." : (isEditing ? "Cập nhật" : "Lưu")}
               </button>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { db, storage } from '../../firebase/firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const EditBook = () => {
@@ -19,31 +19,39 @@ const EditBook = () => {
 
   useEffect(() => {
     const fetchBook = async () => {
-      const bookDoc = await getDoc(doc(db, 'books', id));
-      if (bookDoc.exists()) {
-        setBook(bookDoc.data());
-      } else {
-        console.error("Book not found!");
+      try {
+        const bookDoc = await getDoc(doc(db, 'books', id));
+        if (bookDoc.exists()) {
+          setBook(bookDoc.data());
+        } else {
+          console.error("Book not found!");
+        }
+      } catch (error) {
+        console.error("Error fetching book: ", error);
       }
     };
 
     const fetchData = async () => {
+      try {
         const shelvesCollection = collection(db, 'shelf');
         const shelvesSnapshot = await getDocs(shelvesCollection);
         setShelves(shelvesSnapshot.docs.map(doc => ({ id: doc.id, name: doc.data().BookShelfName })));
-  
+
         const categoriesCollection = collection(db, 'category');
         const categoriesSnapshot = await getDocs(categoriesCollection);
         setCategories(categoriesSnapshot.docs.map(doc => ({ id: doc.id, name: doc.data().categoryName })));
-  
+
         const publishersCollection = collection(db, 'publisher');
         const publishersSnapshot = await getDocs(publishersCollection);
         setPublishers(publishersSnapshot.docs.map(doc => ({ id: doc.id, name: doc.data().PublisherName })));
-  
+
         const authorsCollection = collection(db, 'author');
         const authorsSnapshot = await getDocs(authorsCollection);
         setAuthors(authorsSnapshot.docs.map(doc => ({ id: doc.id, name: doc.data().authorName })));
-      };
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
 
     fetchBook();
     fetchData();
@@ -104,28 +112,28 @@ const EditBook = () => {
   };
 
   return (
-    <div className="mx-auto p-4">
+    <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Chỉnh Sửa Sách</h2>
       {book && (
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block">Tên sách:</label>
+          <div className="row">
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Tên sách:</label>
               <input
                 type="text"
                 name="title"
                 value={book.title}
                 onChange={handleChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Tác giả:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Tác giả:</label>
               <select
                 name="author"
                 value={book.author}
                 onChange={handleChange}
-                className="border w-full px-2 py-1 bg-slate-200"
+                className="form-select"
               >
                 <option value="">Chọn tác giả</option>
                 {authors.map(author => (
@@ -133,33 +141,33 @@ const EditBook = () => {
                 ))}
               </select>
             </div>
-            <div>
-              <label className="block">Chủ đề:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Chủ đề:</label>
               <input
                 type="text"
                 name="subject"
                 value={book.subject}
                 onChange={handleChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Mô tả:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Mô tả:</label>
               <input
                 type="text"
                 name="description"
                 value={book.description}
                 onChange={handleChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Nhà xuất bản:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Nhà xuất bản:</label>
               <select
                 name="publisher"
                 value={book.publisher}
                 onChange={handleChange}
-                className="border w-full px-2 py-1 bg-slate-200"
+                className="form-select"
               >
                 <option value="">Chọn nhà xuất bản</option>
                 {publishers.map(publisher => (
@@ -167,177 +175,186 @@ const EditBook = () => {
                 ))}
               </select>
             </div>
-            <div>
-              <label className="block">Người đóng góp:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Người đóng góp:</label>
               <input
                 type="text"
                 name="contributor"
                 value={book.contributor}
                 onChange={handleChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Ngày phát hành:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Ngày phát hành:</label>
               <input
                 type="date"
                 name="date"
                 value={book.date}
                 onChange={handleChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Loại tài liệu:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Loại tài liệu:</label>
               <input
                 type="text"
                 name="type"
                 value={book.type}
                 onChange={handleChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Định dạng:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Định dạng:</label>
               <input
                 type="text"
                 name="format"
                 value={book.format}
                 onChange={handleChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Mã định danh (ISBN):</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Mã định danh (ISBN):</label>
               <input
                 type="text"
                 name="identifier"
                 value={book.identifier}
                 onChange={handleChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Nguồn:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Nguồn:</label>
               <input
                 type="text"
                 name="source"
                 value={book.source}
                 onChange={handleChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Ngôn ngữ:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Ngôn ngữ:</label>
               <input
                 type="text"
                 name="language"
                 value={book.language}
                 onChange={handleChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Mối quan hệ:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Mối liên hệ:</label>
               <input
                 type="text"
                 name="relation"
                 value={book.relation}
                 onChange={handleChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Phạm vi:</label>
-              <input
-                type="text"
-                name="coverage"
-                value={book.coverage}
-                onChange={handleChange}
-                className="border w-full px-2 py-1"
-              />
-            </div>
-            <div>
-              <label className="block">Quyền:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Bản quyền:</label>
               <input
                 type="text"
                 name="rights"
                 value={book.rights}
                 onChange={handleChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Số trang:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Phạm vi:</label>
               <input
-                type="number"
-                name="pageCount"
-                value={book.pageCount}
+                type="text"
+                name="coverage"
+                value={book.coverage}
                 onChange={handleChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Số lượng:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Số lượng:</label>
               <input
                 type="number"
                 name="quantity"
                 value={book.quantity}
                 onChange={handleChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Tình trạng:</label>
-              <input
-                type="text"
-                name="condition"
-                value={book.condition}
-                onChange={handleChange}
-                className="border w-full px-2 py-1"
-              />
-            </div>
-            <div>
-              <label className="block">Kệ sách:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Vị trí:</label>
               <select
                 name="location"
                 value={book.location}
                 onChange={handleChange}
-                className="border w-full px-2 py-1 bg-slate-200"
+                className="form-select"
               >
-                <option value="">Chọn kệ sách</option>
+                <option value="">Chọn vị trí</option>
                 {shelves.map(shelf => (
                   <option key={shelf.id} value={shelf.name}>{shelf.name}</option>
                 ))}
               </select>
             </div>
-            <div>
-              <label className="block">Ảnh bìa:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Tình trạng:</label>
+              <input
+                type="text"
+                name="condition"
+                value={book.condition}
+                onChange={handleChange}
+                className="form-control"
+              />
+            </div>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Danh mục:</label>
+              <select
+                name="category"
+                value={book.category}
+                onChange={handleChange}
+                className="form-select"
+              >
+                <option value="">Chọn danh mục</option>
+                {categories.map(category => (
+                  <option key={category.id} value={category.name}>{category.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Ảnh bìa:</label>
               <input
                 type="file"
+                name="coverImage"
                 onChange={handleFileChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Tải lên PDF:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Tải lên PDF:</label>
               <input
                 type="file"
+                name="pdfFile"
                 onChange={handlePdfChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
-            <div>
-              <label className="block">Tải lên Audio:</label>
+            <div className="col-md-4 mb-3">
+              <label className="form-label">Tải lên Audio:</label>
               <input
                 type="file"
+                name="audioFile"
                 onChange={handleAudioChange}
-                className="border w-full px-2 py-1"
+                className="form-control"
               />
             </div>
           </div>
           <div className="mt-4">
-            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Cập nhật sách</button>
+            <button type="submit" className="btn btn-primary">
+              Cập Nhật Sách
+            </button>
           </div>
         </form>
       )}

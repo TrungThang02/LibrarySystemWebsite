@@ -6,6 +6,8 @@ import Swal from 'sweetalert2';
 
 const Books = () => {
   const [Books, setBooks] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [booksPerPage] = useState(5); 
   const navigate = useNavigate();
 
   const handleViewDetail = (id) => {
@@ -34,13 +36,9 @@ const Books = () => {
 
     if (result.isConfirmed) {
       try {
-        // Add doc reference to delete the correct document
         const bookDocRef = doc(db, 'books', id);
         await deleteDoc(bookDocRef);
-        
-        // Update the local state after deleting the book
         setBooks(Books.filter(Book => Book.id !== id));
-        
         Swal.fire('Đã xóa!', 'Sách đã được xóa.', 'success');
       } catch (error) {
         console.error("Error deleting Book: ", error);
@@ -67,6 +65,13 @@ const Books = () => {
     fetchBooks();
   }, []);
 
+  const indexOfLastBook = currentPage * booksPerPage;
+  const indexOfFirstBook = indexOfLastBook - booksPerPage;
+  const currentBooks = Books.slice(indexOfFirstBook, indexOfLastBook);
+
+
+  const paginate = pageNumber => setCurrentPage(pageNumber);
+
   return (
     <div className="mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Quản lý sách</h2>
@@ -88,7 +93,7 @@ const Books = () => {
           </tr>
         </thead>
         <tbody>
-          {Books.map(Book => (
+          {currentBooks.map(Book => (
             <tr key={Book.id} className="border-b">
               <td className="py-2 px-4 border-r">
                 <img src={Book.coverImage} alt={Book.title} className="w-16 h-24 object-cover" />
@@ -106,6 +111,13 @@ const Books = () => {
           ))}
         </tbody>
       </table>
+      <div className="flex justify-center mt-4">
+        {[...Array(Math.ceil(Books.length / booksPerPage)).keys()].map(number => (
+          <button key={number} onClick={() => paginate(number + 1)} className="mx-1 px-3 py-1 bg-gray-300 rounded">
+            {number + 1}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
