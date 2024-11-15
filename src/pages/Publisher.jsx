@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebase/firebase';
 import { collection, getDocs, addDoc, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import Swal from 'sweetalert2';
-
+import { FaEdit, FaTrash } from 'react-icons/fa';
 const Publisher = () => {
     const [Publishers, setPublishers] = useState([]);
     const [showModal, setShowModal] = useState(false);
@@ -56,6 +56,14 @@ const Publisher = () => {
     };
 
     const handleSave = async () => {
+        // Validate input fields using Tabler's form validation
+        const form = document.getElementById('publisherForm');
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+
+            return;
+        }
+
         try {
             if (isEditing && currentPublisherId) {
                 // Update document in Firestore
@@ -119,14 +127,14 @@ const Publisher = () => {
 
     return (
         <div className="mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">Quản lý nhà xuất bản</h2>
+            {/* <h2 className="text-2xl font-bold mb-4">Quản lý nhà xuất bản</h2> */}
             <button
-                className="btn btn-primary mb-4"
+                className="btn btn-primary mb-3"
                 onClick={handleOpenModal} // Open modal
             >
                 Thêm nhà xuất bản
             </button>
-            <table className="table table-striped table-hover">
+            <table className="table table-bordered table-hover">
                 <thead>
                     <tr>
                         <th>Tên nhà xuất bản</th>
@@ -147,16 +155,18 @@ const Publisher = () => {
                             <td>{Publisher.website}</td>
                             <td>
                                 <button
-                                    className="btn btn-warning btn-sm"
+                                    className="btn btn-warning"
                                     onClick={() => handleEdit(Publisher)}
+                                    title="Sửa"
                                 >
-                                    Sửa
+                                    <FaEdit size={16} />
                                 </button>
                                 <button
-                                    className="btn btn-danger btn-sm ml-2"
+                                    className="btn btn-danger ml-2"
                                     onClick={() => handleDelete(Publisher.id)}
+                                    title="Xóa"
                                 >
-                                    Xóa
+                                    <FaTrash size={16} />
                                 </button>
                             </td>
                         </tr>
@@ -173,61 +183,73 @@ const Publisher = () => {
                                 <button type="button" className="close" onClick={handleCloseModal}>&times;</button>
                             </div>
                             <div className="modal-body">
-                                <div className="form-group">
-                                    <label htmlFor="PublisherName">Tên nhà xuất bản</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        name="PublisherName"
-                                        value={newPublisher.PublisherName}
-                                        onChange={handleChange}
-                                        placeholder="Nhập tên nhà xuất bản"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="phoneNumber">Số điện thoại</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        name="phoneNumber"
-                                        value={newPublisher.phoneNumber}
-                                        onChange={handleChange}
-                                        placeholder="Nhập số điện thoại"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="email">Email</label>
-                                    <input
-                                        type="email"
-                                        className="form-control"
-                                        name="email"
-                                        value={newPublisher.email}
-                                        onChange={handleChange}
-                                        placeholder="Nhập email"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="address">Địa chỉ</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        name="address"
-                                        value={newPublisher.address}
-                                        onChange={handleChange}
-                                        placeholder="Nhập địa chỉ"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="website">Website</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        name="website"
-                                        value={newPublisher.website}
-                                        onChange={handleChange}
-                                        placeholder="Nhập website"
-                                    />
-                                </div>
+                                <form id="publisherForm" noValidate>
+                                    <div className="form-group">
+                                        <label htmlFor="PublisherName">Tên nhà xuất bản</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="PublisherName"
+                                            value={newPublisher.PublisherName}
+                                            onChange={handleChange}
+                                            placeholder="Nhập tên nhà xuất bản"
+                                            required
+                                        />
+                                        <div className="invalid-feedback">Tên nhà xuất bản là bắt buộc.</div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="phoneNumber">Số điện thoại</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="phoneNumber"
+                                            value={newPublisher.phoneNumber}
+                                            onChange={handleChange}
+                                            placeholder="Nhập số điện thoại"
+                                            required
+                                        />
+                                        <div className="invalid-feedback">Số điện thoại là bắt buộc.</div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="email">Email</label>
+                                        <input
+                                            type="email"
+                                            className="form-control"
+                                            name="email"
+                                            value={newPublisher.email}
+                                            onChange={handleChange}
+                                            placeholder="Nhập email"
+                                            required
+                                        />
+                                        <div className="invalid-feedback">Email là bắt buộc.</div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="address">Địa chỉ</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="address"
+                                            value={newPublisher.address}
+                                            onChange={handleChange}
+                                            placeholder="Nhập địa chỉ"
+                                            required
+                                        />
+                                        <div className="invalid-feedback">Địa chỉ là bắt buộc.</div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="website">Website</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="website"
+                                            value={newPublisher.website}
+                                            onChange={handleChange}
+                                            placeholder="Nhập website"
+                                            required
+                                        />
+                                        <div className="invalid-feedback">Website là bắt buộc.</div>
+                                    </div>
+                                </form>
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>Hủy</button>

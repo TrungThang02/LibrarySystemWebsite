@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { db } from '../../firebase/firebase';
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import Swal from 'sweetalert2';
-
+import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 const Books = () => {
   const [Books, setBooks] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [booksPerPage] = useState(5); 
+  const [booksPerPage] = useState(5);
   const navigate = useNavigate();
 
   const handleViewDetail = (id) => {
@@ -74,39 +74,59 @@ const Books = () => {
 
   return (
     <div className="mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Quản lý sách</h2>
+      {/* <h2 className="text-2xl font-bold mb-4">Quản lý sách</h2> */}
       <button
-        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-green-600 mb-4"
+        className="btn btn-primary mb-3"
         onClick={handleAddBook}
       >
         Thêm Sách
       </button>
-      <table className="min-w-full bg-white border border-gray-300">
+
+      <table className="table table-bordered table-hover">
         <thead>
-          <tr className="w-full bg-gray-100 border-b">
-            <th className="py-2 px-4 border-r">Hình ảnh</th>
-            <th className="py-2 px-4 border-r">Tên sách</th>
-            <th className="py-2 px-4 border-r">Tác giả</th>
-            <th className="py-2 px-4 border-r">Nhà xuất bản</th>
-            <th className="py-2 px-4 border-r">Số lượng</th>
-            <th className="py-2 px-4"></th>
+          <tr>
+            <th>Hình ảnh</th>
+            <th>Tên sách</th>
+            <th>Tác giả</th>
+            <th>Nhà xuất bản</th>
+            <th>Số lượng</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           {currentBooks.map(Book => (
             <tr key={Book.id} className="border-b">
-              <td className="py-2 px-4 border-r">
+              <td>
                 <img src={Book.coverImage} alt={Book.title} className="w-16 h-24 object-cover" />
               </td>
-              <td className="py-2 px-4 border-r">{Book.title}</td>
-              <td className="py-2 px-4 border-r">{Book.author}</td>
-              <td className="py-2 px-4 border-r">{Book.publisher}</td>
-              <td className="py-2 px-4 border-r">{Book.quantity}</td>
-              <td className="py-2 px-4">
-                <button onClick={() => handleEdit(Book)} className="rounded py-1 px-4 bg-blue-300">Sửa</button>
-                <button onClick={() => handleDelete(Book.id)} className="rounded py-1 px-4 ml-2 bg-green-300">Xóa</button>
-                <button onClick={() => handleViewDetail(Book.id)} className="rounded py-1 px-4 ml-2 bg-red-300">Xem chi tiết</button>
-              </td>
+              <td>{Book.title}</td>
+              <td>{Book.author}</td>
+              <td>{Book.publisher}</td>
+              <td>{Book.quantity}</td>
+              <td>
+      <button
+        onClick={() => handleEdit(Book)}
+        className="btn btn-primary me-2"
+        title="Sửa"
+      >
+        <FaEdit size={16} />
+      </button>
+      <button
+        onClick={() => handleViewDetail(Book.id)}
+        className="btn btn-success me-2"
+        title="Xem chi tiết"
+      >
+        <FaEye size={16} />
+      </button>
+      <button
+        onClick={() => handleDelete(Book.id)}
+        className="btn btn-danger "
+        title="Xóa"
+      >
+        <FaTrash size={16} />
+      </button>
+     
+    </td>
             </tr>
           ))}
         </tbody>

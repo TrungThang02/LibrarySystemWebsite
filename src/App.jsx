@@ -8,7 +8,7 @@ import Login from './pages/Auth/Login';
 
 import BorrowReturnBooks from './pages/BorrowReturnBooks';
 import { AuthProvider } from '../context/authContext';
-import News from './pages/News';
+
 import Books from './pages/Books/Books';
 import BookCategory from './pages/BookCategory';
 import ShelfLocation from './pages/ShelfLocation';
@@ -26,7 +26,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/user" element={<User />} />
-          <Route path="/news" element={<News />} />
+        
           <Route path="/return" element={<BorrowReturnBooks />} />
           <Route path="/books" element={<Books />} />
           <Route path="/shelf" element={<ShelfLocation />} />

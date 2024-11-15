@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebase/firebase';
 import { collection, getDocs, addDoc, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import Swal from 'sweetalert2';
-
+import { FaEdit, FaTrash } from 'react-icons/fa';
 const User = () => {
   const [users, setUsers] = useState([]);
 
@@ -60,9 +60,9 @@ const User = () => {
 
   return (
     <div className="mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Quản lý người dùng</h2>
+      {/* <h2 className="text-2xl font-bold mb-4">Quản lý người dùng</h2> */}
       
-      <table className="min-w-full bg-white border border-gray-300">
+      <table className="table table-bordered table-hover">
         <thead>
           <tr className="w-full bg-gray-100 border-b">
             <th className="py-2 px-4 border-r">Tên</th>
@@ -78,13 +78,14 @@ const User = () => {
               <td className="py-2 px-4 border-r">{user.email}</td>
               <td className="py-2 px-4 border-r">{user.role}</td>
               <td className="py-2 px-4 flex gap-2">
-        
-                <button
-                  className="bg-red-500 text-white py-1 px-2 rounded"
-                  onClick={() => handleDelete(user.id)}
-                >
-                  Xóa
-                </button>
+              <button
+        className="btn btn-danger"
+        onClick={() => handleDelete(user.id)}
+        title="Xóa"
+      >
+        <FaTrash size={16} />
+      </button>
+                
               </td>
             </tr>
           ))}

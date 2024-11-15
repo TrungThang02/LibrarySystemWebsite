@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebase/firebase';
 import { collection, getDocs, addDoc, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import Swal from 'sweetalert2';
-
+import { FaEdit, FaTrash } from 'react-icons/fa';
 const Author = () => {
-    const [Authors, setAuthors] = useState([]);
+    const [authors, setAuthors] = useState([]);
     const [publishers, setPublishers] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -74,6 +74,14 @@ const Author = () => {
     };
 
     const handleSave = async () => {
+        // Validate input fields using Tabler's form validation
+        const form = document.getElementById('authorForm');
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+           
+            return;
+        }
+
         try {
             if (isEditing && currentAuthorId) {
                 const authorRef = doc(db, 'author', currentAuthorId);
@@ -84,7 +92,7 @@ const Author = () => {
             } else {
                 const authorsCollection = collection(db, 'author');
                 const docRef = await addDoc(authorsCollection, newAuthor);
-                setAuthors([...Authors, { id: docRef.id, ...newAuthor }]);
+                setAuthors([...authors, { id: docRef.id, ...newAuthor }]);
             }
 
             handleCloseModal();
@@ -122,7 +130,7 @@ const Author = () => {
         if (result.isConfirmed) {
             try {
                 await deleteDoc(doc(db, 'author', id));
-                setAuthors(Authors.filter(author => author.id !== id));
+                setAuthors(authors.filter(author => author.id !== id));
                 Swal.fire('Đã xóa!', 'Tác giả đã được xóa.', 'success');
             } catch (error) {
                 console.error("Error deleting author: ", error);
@@ -131,8 +139,8 @@ const Author = () => {
     };
 
     return (
-        <div className="container mt-5">
-            <h2 className="h2">Quản lý tác giả</h2>
+        <div className="mx-auto p-4">
+            {/* <h2 className="text-2xl font-bold mb-4">Quản lý tác giả</h2> */}
             <button
                 className="btn btn-primary mb-3"
                 onClick={handleOpenModal}
@@ -153,7 +161,7 @@ const Author = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {Authors.map(author => (
+                        {authors.map(author => (
                             <tr key={author.id}>
                                 <td>{author.authorName}</td>
                                 <td>{author.phoneNumber}</td>
@@ -166,19 +174,21 @@ const Author = () => {
                                     }
                                 </td>
                                 <td>
-                                    <button
-                                        className="btn btn-warning btn-sm me-2"
-                                        onClick={() => handleEdit(author)}
-                                    >
-                                        Sửa
-                                    </button>
-                                    <button
-                                        className="btn btn-danger btn-sm"
-                                        onClick={() => handleDelete(author.id)}
-                                    >
-                                        Xóa
-                                    </button>
-                                </td>
+      <button
+        className="btn btn-warning me-2"
+        onClick={() => handleEdit(author)}
+        title="Sửa"
+      >
+        <FaEdit size={16} />
+      </button>
+      <button
+        className="btn btn-danger"
+        onClick={() => handleDelete(author.id)}
+        title="Xóa"
+      >
+        <FaTrash size={16} />
+      </button>
+    </td>
                             </tr>
                         ))}
                     </tbody>
@@ -186,86 +196,97 @@ const Author = () => {
             </div>
 
             {showModal && (
-                <div className="modal fade show" tabIndex="-1" style={{ display: 'block' }} aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div className="modal show d-block" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
                     <div className="modal-dialog modal-dialog-centered">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title" id="exampleModalLabel">{isEditing ? "Chỉnh sửa tác giả" : "Thêm tác giả"}</h5>
-                                <button type="button" className="btn-close" data-bs-dismiss="modal" onClick={handleCloseModal} aria-label="Close"></button>
+                                <h5 className="modal-title">{isEditing ? "Chỉnh sửa tác giả" : "Thêm tác giả"}</h5>
+                                <button type="button" className="close" onClick={handleCloseModal}>&times;</button>
                             </div>
                             <div className="modal-body">
-                                <div className="mb-3">
-                                    <label htmlFor="authorName" className="form-label">Tên tác giả</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="authorName"
-                                        name="authorName"
-                                        value={newAuthor.authorName}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="phoneNumber" className="form-label">Số điện thoại</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="phoneNumber"
-                                        name="phoneNumber"
-                                        value={newAuthor.phoneNumber}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="email" className="form-label">Email</label>
-                                    <input
-                                        type="email"
-                                        className="form-control"
-                                        id="email"
-                                        name="email"
-                                        value={newAuthor.email}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="degree" className="form-label">Bằng cấp</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="degree"
-                                        name="degree"
-                                        value={newAuthor.degree}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="basicInfo" className="form-label">Thông tin cơ bản</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="basicInfo"
-                                        name="basicInfo"
-                                        value={newAuthor.basicInfo}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="publisherId" className="form-label">Nhà xuất bản</label>
-                                    <select
-                                        className="form-select"
-                                        id="publisherId"
-                                        name="publisherId"
-                                        value={newAuthor.publisherId || ''}
-                                        onChange={handleChange}
-                                    >
-                                        <option value="">Chọn nhà xuất bản</option>
-                                        {publishers.map(publisher => (
-                                            <option key={publisher.id} value={publisher.id}>
-                                                {publisher.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                                <form id="authorForm" noValidate>
+                                    <div className="form-group">
+                                        <label htmlFor="authorName">Tên tác giả</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="authorName"
+                                            value={newAuthor.authorName}
+                                            onChange={handleChange}
+                                            placeholder="Nhập tên tác giả"
+                                            required
+                                        />
+                                        <div className="invalid-feedback">Tên tác giả là bắt buộc.</div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="phoneNumber">Số điện thoại</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="phoneNumber"
+                                            value={newAuthor.phoneNumber}
+                                            onChange={handleChange}
+                                            placeholder="Nhập số điện thoại"
+                                            required
+                                        />
+                                        <div className="invalid-feedback">Số điện thoại là bắt buộc.</div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="email">Email</label>
+                                        <input
+                                            type="email"
+                                            className="form-control"
+                                            name="email"
+                                            value={newAuthor.email}
+                                            onChange={handleChange}
+                                            placeholder="Nhập email"
+                                            required
+                                        />
+                                        <div className="invalid-feedback">Email là bắt buộc.</div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="degree">Bằng cấp</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="degree"
+                                            value={newAuthor.degree}
+                                            onChange={handleChange}
+                                            placeholder="Nhập bằng cấp"
+                                            required
+                                        />
+                                        <div className="invalid-feedback">Bằng cấp là bắt buộc.</div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="basicInfo">Thông tin cơ bản</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="basicInfo"
+                                            value={newAuthor.basicInfo}
+                                            onChange={handleChange}
+                                            placeholder="Nhập thông tin cơ bản"
+                                            required
+                                        />
+                                        <div className="invalid-feedback">Thông tin cơ bản là bắt buộc.</div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="publisherId">Nhà xuất bản</label>
+                                        <select
+                                            className="form-control"
+                                            name="publisherId"
+                                            value={newAuthor.publisherId}
+                                            onChange={handleChange}
+                                            required
+                                        >
+                                            <option value="">Chọn nhà xuất bản</option>
+                                            {publishers.map(publisher => (
+                                                <option key={publisher.id} value={publisher.id}>{publisher.name}</option>
+                                            ))}
+                                        </select>
+                                        <div className="invalid-feedback">Nhà xuất bản là bắt buộc.</div>
+                                    </div>
+                                </form>
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>Hủy</button>

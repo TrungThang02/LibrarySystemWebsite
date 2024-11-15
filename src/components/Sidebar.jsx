@@ -26,7 +26,7 @@ const Sidebar = ({ children }) => {
         '/user': 'QUẢN LÝ NGƯỜI DÙNG',
     };
 
-    const currentPageTitle = pageTitles[location.pathname] || 'Trang chủ'; // Default to "Trang chủ" if no match
+    const currentPageTitle = pageTitles[location.pathname] || '';
 
     const menuItem = [
         { path: '/', name: 'Trang tổng quan', icon: <FaHome /> },
@@ -84,10 +84,10 @@ const Sidebar = ({ children }) => {
                 <header className="bg-blue-500 text-white p-3 flex-shrink-0">
                     <div className="flex justify-between items-center">
                         <h1 className="m-0">{currentPageTitle}</h1>
-                        <div className="flex items-center">
+                        {/* <div className="flex items-center">
                             <button className="btn btn-primary me-2">Notifications</button>
                             <button className="btn btn-danger">Log out</button>
-                        </div>
+                        </div> */}
                     </div>
                 </header>
 

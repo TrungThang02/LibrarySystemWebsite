@@ -145,15 +145,22 @@ const AddBook = () => {
             </select>
           </div>
           <div>
-            <label className="block">Chủ đề:</label>
-            <input
-              type="text"
-              name="subject"
-              value={newBook.subject}
-              onChange={handleChange}
-              className="border w-full px-2 py-1"
-            />
-          </div>
+  <label className="block">Chủ đề:</label>
+  <select
+    name="category"
+    value={newBook.category}
+    onChange={handleChange}
+    className="border w-full px-2 py-1 bg-slate-200"
+  >
+    <option value="">Chọn chủ đề</option>
+    {categories.map(category => (
+      <option key={category.id} value={category.name}>
+        {category.name}
+      </option>
+    ))}
+  </select>
+</div>
+
           <div>
             <label className="block">Mô tả:</label>
             <input

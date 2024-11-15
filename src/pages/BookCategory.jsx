@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebase/firebase';
 import { collection, getDocs, addDoc, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import Swal from 'sweetalert2';
-
+import { FaEdit, FaTrash } from 'react-icons/fa';
 const BookCategory = () => {
   const [bookCategories, setBookCategories] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentBookCategoryId, setCurrentBookCategoryId] = useState(null);
   const [newBookCategory, setNewBookCategory] = useState({ categoryName: '' });
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({}); // State to track validation errors
 
-  // Fetching categories from Firestore
   useEffect(() => {
     const fetchBookCategories = async () => {
       try {
@@ -35,6 +35,7 @@ const BookCategory = () => {
     setShowModal(false);
     setIsEditing(false);
     setNewBookCategory({ categoryName: '' });
+    setErrors({}); // Reset errors when modal is closed
   };
 
   const handleChange = (e) => {
@@ -45,24 +46,30 @@ const BookCategory = () => {
     }));
   };
 
-  // Handle saving the category
-  const handleSave = async () => {
+  const validateForm = () => {
+    let formErrors = {};
     if (!newBookCategory.categoryName.trim()) {
-      Swal.fire('Lỗi', 'Tên danh mục không được để trống!', 'error');
+      formErrors.categoryName = 'Tên danh mục không được để trống!';
+    }
+    setErrors(formErrors);
+    return Object.keys(formErrors).length === 0;
+  };
+
+  const handleSave = async () => {
+    if (!validateForm()) {
+
       return;
     }
 
     setLoading(true);
     try {
       if (isEditing && currentBookCategoryId) {
-        // Update existing category
         const bookCategoryRef = doc(db, 'category', currentBookCategoryId);
         await updateDoc(bookCategoryRef, newBookCategory);
         setBookCategories(prev => prev.map(bookCategory =>
           bookCategory.id === currentBookCategoryId ? { ...bookCategory, ...newBookCategory } : bookCategory
         ));
       } else {
-        // Add new category
         const bookCategoriesCollection = collection(db, 'category');
         const docRef = await addDoc(bookCategoriesCollection, newBookCategory);
         setBookCategories([...bookCategories, { id: docRef.id, ...newBookCategory }]);
@@ -77,7 +84,6 @@ const BookCategory = () => {
     }
   };
 
-  // Open modal for editing a category
   const handleEdit = (bookCategory) => {
     setNewBookCategory({ categoryName: bookCategory.categoryName });
     setCurrentBookCategoryId(bookCategory.id);
@@ -85,7 +91,6 @@ const BookCategory = () => {
     handleOpenModal();
   };
 
-  // Handle category deletion
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: 'Xóa Danh mục?',
@@ -110,15 +115,15 @@ const BookCategory = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <h2 className="h2">Danh mục</h2>
+    <div className="mx-auto p-4">
+      {/* <h2 className="text-2xl font-bold mb-4">Quản lý danh mục</h2> */}
       <button
-        className="btn btn-primary mb-4"
+        className="btn btn-primary mb-3"
         onClick={handleOpenModal}
       >
         Thêm Danh mục
       </button>
-      <table className="table table-striped table-hover">
+      <table className="table table-bordered table-hover">
         <thead>
           <tr>
             <th>Tên danh mục sách</th>
@@ -133,56 +138,63 @@ const BookCategory = () => {
                 <button
                   className="btn btn-warning mr-2"
                   onClick={() => handleEdit(bookCategory)}
+                  title="Sửa"
                 >
-                  Sửa
+                  <FaEdit size={18} />
                 </button>
                 <button
                   className="btn btn-danger"
                   onClick={() => handleDelete(bookCategory.id)}
+                  title="Xóa"
                 >
-                  Xóa
+                  <FaTrash size={18} />
                 </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-
-      {/* Modal for adding/editing categories */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-bold mb-4">{isEditing ? "Chỉnh sửa danh mục" : "Thêm danh mục"}</h2>
-            <div className="mb-4">
-              <label htmlFor="categoryName" className="block text-sm font-medium text-gray-700">Tên danh mục sách</label>
-              <input
-                type="text"
-                className="w-full p-2 border border-gray-300 rounded mt-1"
-                id="categoryName"
-                name="categoryName"
-                placeholder="Nhập tên danh mục sách"
-                value={newBookCategory.categoryName}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <button
-                className="bg-gray-500 text-white py-2 px-4 rounded"
-                onClick={handleCloseModal}
-              >
-                Hủy
-              </button>
-              <button
-                className={`bg-blue-500 text-white py-2 px-4 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                onClick={handleSave}
-                disabled={loading}
-              >
-                {loading ? "Đang lưu..." : (isEditing ? "Cập nhật" : "Lưu")}
-              </button>
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">{isEditing ? "Chỉnh sửa danh mục" : "Thêm danh mục"}</h5>
+                <button type="button" className="close" onClick={handleCloseModal}>&times;</button>
+              </div>
+              <div className="modal-body">
+                <form id="categoryForm" noValidate>
+                  <div className="form-group">
+                    <label htmlFor="categoryName">Tên danh mục sách</label>
+                    <input
+                      type="text"
+                      className={`form-control ${errors.categoryName ? 'is-invalid' : ''}`}
+                      name="categoryName"
+                      value={newBookCategory.categoryName}
+                      onChange={handleChange}
+                      placeholder="Nhập tên danh mục sách"
+                      required
+                    />
+                    <div className="invalid-feedback">{errors.categoryName}</div>
+                  </div>
+                </form>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>Hủy</button>
+                <button
+                  type="button"
+                  className={`btn btn-primary ${loading ? 'disabled' : ''}`}
+                  onClick={handleSave}
+                  disabled={loading}
+                >
+                  {loading ? "Đang lưu..." : (isEditing ? "Cập nhật" : "Lưu")}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 };

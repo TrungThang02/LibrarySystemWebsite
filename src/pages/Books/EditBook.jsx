@@ -142,14 +142,18 @@ const EditBook = () => {
               </select>
             </div>
             <div className="col-md-4 mb-3">
-              <label className="form-label">Chủ đề:</label>
-              <input
-                type="text"
-                name="subject"
-                value={book.subject}
+              <label className="form-label">Danh mục:</label>
+              <select
+                name="category"
+                value={book.category}
                 onChange={handleChange}
-                className="form-control"
-              />
+                className="form-select"
+              >
+                <option value="">Chọn danh mục</option>
+                {categories.map(category => (
+                  <option key={category.id} value={category.name}>{category.name}</option>
+                ))}
+              </select>
             </div>
             <div className="col-md-4 mb-3">
               <label className="form-label">Mô tả:</label>
@@ -275,6 +279,16 @@ const EditBook = () => {
                 className="form-control"
               />
             </div>
+            <div>
+            <label className="block">Số trang:</label>
+            <input
+              type="number"
+              name="pageCount"
+              value={book.pageCount}
+              onChange={handleChange}
+              className="border w-full px-2 py-1"
+            />
+          </div>
             <div className="col-md-4 mb-3">
               <label className="form-label">Số lượng:</label>
               <input
@@ -309,20 +323,7 @@ const EditBook = () => {
                 className="form-control"
               />
             </div>
-            <div className="col-md-4 mb-3">
-              <label className="form-label">Danh mục:</label>
-              <select
-                name="category"
-                value={book.category}
-                onChange={handleChange}
-                className="form-select"
-              >
-                <option value="">Chọn danh mục</option>
-                {categories.map(category => (
-                  <option key={category.id} value={category.name}>{category.name}</option>
-                ))}
-              </select>
-            </div>
+            
             <div className="col-md-4 mb-3">
               <label className="form-label">Ảnh bìa:</label>
               <input
