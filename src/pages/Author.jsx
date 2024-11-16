@@ -175,7 +175,7 @@ const Author = () => {
                                 </td>
                                 <td>
       <button
-        className="btn btn-warning me-2"
+        className="btn btn-primary me-2"
         onClick={() => handleEdit(author)}
         title="Sửa"
       >

@@ -44,15 +44,33 @@ const ShelfLocation = () => {
     };
 
     const handleSave = async () => {
-        // Validate input fields using Tabler's form validation
+        // Step 1: Validate input fields using Tabler's form validation
         const form = document.getElementById('shelfForm');
         if (!form.checkValidity()) {
             form.classList.add('was-validated');
-           
             return;
         }
-
+    
         try {
+            // Step 2: Check if bookshelf already has books (to prevent renaming)
+            if (isEditing && newBookShelf.BookShelfName !== BookShelfs.find(shelf => shelf.id === currentBookShelfId)?.BookShelfName) {
+                // Query the books collection to see if any book is associated with this bookshelf
+                const booksCollection = collection(db, 'books');
+                const booksSnapshot = await getDocs(booksCollection);
+                const booksInShelf = booksSnapshot.docs.filter(bookDoc => bookDoc.data().BookShelfName === newBookShelf.BookShelfName);
+    
+                // Step 3: If books are found, prevent renaming
+                if (booksInShelf.length > 0) {
+                    Swal.fire(
+                        'Không thể đổi tên!',
+                        'Kệ sách này đã có sách, không thể đổi tên.',
+                        'error'
+                    );
+                    return; // Stop the process if there are books
+                }
+            }
+    
+            // Step 4: Handle saving or updating the bookshelf
             if (isEditing && currentBookShelfId) {
                 // Update document in Firestore
                 const BookShelfRef = doc(db, 'shelf', currentBookShelfId);
@@ -61,17 +79,18 @@ const ShelfLocation = () => {
                     BookShelf.id === currentBookShelfId ? { ...BookShelf, ...newBookShelf } : BookShelf
                 ));
             } else {
-                // Add new document to Firestore
+                // Add new bookshelf to Firestore
                 const BookShelfsCollection = collection(db, 'shelf');
                 const docRef = await addDoc(BookShelfsCollection, newBookShelf);
                 setBookShelfs([...BookShelfs, { id: docRef.id, ...newBookShelf }]);
             }
-
+    
             handleCloseModal();
         } catch (error) {
             console.error("Error saving BookShelf: ", error);
         }
     };
+    
 
     const handleEdit = (BookShelf) => {
         setNewBookShelf({ BookShelfName: BookShelf.BookShelfName, Quantity: BookShelf.Quantity });
@@ -80,7 +99,23 @@ const ShelfLocation = () => {
         handleOpenModal();
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (id, BookShelfName) => {
+        // Step 1: Query the books collection to check if any book is associated with this BookShelfName
+        const booksCollection = collection(db, 'books');
+        const booksSnapshot = await getDocs(booksCollection);
+        const booksInShelf = booksSnapshot.docs.filter(bookDoc => bookDoc.data().BookShelfName === BookShelfName); // Check if any book has the same BookShelfName
+    
+        // Step 2: If there are books in this shelf, show an alert and prevent deletion
+        if (booksInShelf.length > 0) {
+            Swal.fire(
+                'Không thể xóa!',
+                'Kệ sách này có sách, không thể xóa.',
+                'error'
+            );
+            return; // Exit early if books are found
+        }
+    
+        // Step 3: If no books found, proceed with deletion
         const result = await Swal.fire({
             title: 'Xóa kệ này?',
             text: "Bạn có chắc chắn muốn xóa kệ này?",
@@ -91,11 +126,11 @@ const ShelfLocation = () => {
             confirmButtonText: 'Xóa',
             cancelButtonText: 'Hủy'
         });
-
+    
         if (result.isConfirmed) {
             try {
-                await deleteDoc(doc(db, 'shelf', id));
-                setBookShelfs(BookShelfs.filter(BookShelf => BookShelf.id !== id));
+                await deleteDoc(doc(db, 'shelf', id)); // Delete the bookshelf
+                setBookShelfs(BookShelfs.filter(BookShelf => BookShelf.id !== id)); // Update local state
                 Swal.fire(
                     'Đã xóa!',
                     'Danh mục đã được xóa.',
@@ -106,6 +141,7 @@ const ShelfLocation = () => {
             }
         }
     };
+    
 
     return (
       <div className="mx-auto p-4">

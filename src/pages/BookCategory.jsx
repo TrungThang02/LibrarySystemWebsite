@@ -136,7 +136,7 @@ const BookCategory = () => {
               <td>{bookCategory.categoryName}</td>
               <td>
                 <button
-                  className="btn btn-warning mr-2"
+                  className="btn btn-primary mr-2"
                   onClick={() => handleEdit(bookCategory)}
                   title="Sửa"
                 >

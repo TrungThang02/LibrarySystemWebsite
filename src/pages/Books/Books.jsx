@@ -95,7 +95,7 @@ const Books = () => {
         </thead>
         <tbody>
           {currentBooks.map(Book => (
-            <tr key={Book.id} className="border-b">
+            <tr key={Book.id} className="border-b align-middle">
               <td>
                 <img src={Book.coverImage} alt={Book.title} className="w-16 h-24 object-cover" />
               </td>
@@ -104,29 +104,29 @@ const Books = () => {
               <td>{Book.publisher}</td>
               <td>{Book.quantity}</td>
               <td>
-      <button
-        onClick={() => handleEdit(Book)}
-        className="btn btn-primary me-2"
-        title="Sửa"
-      >
-        <FaEdit size={16} />
-      </button>
-      <button
-        onClick={() => handleViewDetail(Book.id)}
-        className="btn btn-success me-2"
-        title="Xem chi tiết"
-      >
-        <FaEye size={16} />
-      </button>
-      <button
-        onClick={() => handleDelete(Book.id)}
-        className="btn btn-danger "
-        title="Xóa"
-      >
-        <FaTrash size={16} />
-      </button>
-     
-    </td>
+                <button
+                  onClick={() => handleEdit(Book)}
+                  className="btn btn-primary me-2"
+                  title="Sửa"
+                >
+                  <FaEdit size={16} />
+                </button>
+                <button
+                  onClick={() => handleViewDetail(Book.id)}
+                  className="btn btn-success me-2"
+                  title="Xem chi tiết"
+                >
+                  <FaEye size={16} />
+                </button>
+                <button
+                  onClick={() => handleDelete(Book.id)}
+                  className="btn btn-danger "
+                  title="Xóa"
+                >
+                  <FaTrash size={16} />
+                </button>
+
+              </td>
             </tr>
           ))}
         </tbody>

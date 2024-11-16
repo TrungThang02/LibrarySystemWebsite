@@ -155,7 +155,7 @@ const Publisher = () => {
                             <td>{Publisher.website}</td>
                             <td>
                                 <button
-                                    className="btn btn-warning"
+                                    className="btn btn-primary"
                                     onClick={() => handleEdit(Publisher)}
                                     title="Sửa"
                                 >
