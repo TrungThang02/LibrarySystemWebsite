@@ -1,9 +1,8 @@
-// src/pages/Login.jsx
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-
 import { auth } from '../../firebase/firebase';
 import { useNavigate } from 'react-router-dom';
+import background from '../../assets/background.jpg'; // Import the background image
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -15,7 +14,7 @@ const Login = () => {
         e.preventDefault();
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            navigate('/'); 
+            navigate('/');
         } catch (err) {
             setError('Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.');
         }
@@ -23,43 +22,67 @@ const Login = () => {
 
     return (
         <div
-            className="flex items-center justify-center h-screen bg-cover bg-center bgr"
-           
+            className="d-flex align-items-center justify-content-center vh-100 bg-cover bg-center"
+            style={{
+                backgroundImage: `url(${background})`, // Use the imported background variable here
+                position: 'relative',
+            }}
         >
-            <div className="w-full max-w-md bg-white p-8 rounded blur-background form-container">
+            {/* Overlay */}
+            <div
+                className="position-absolute top-0 left-0 right-0 bottom-0"
+                style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    zIndex: 1,
+                }}
+            ></div>
+
+            <div
+                className="card shadow-sm p-5 rounded w-100"
+                style={{
+                    maxWidth: '400px',
+                    zIndex: 2,
+                    backdropFilter: 'blur(2px)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                    borderRadius: '20px',
+                }}
+            >
                 <form onSubmit={handleSubmit}>
-                    <h2 className="text-center text-2xl font-bold mb-4 text-white">ĐĂNG NHẬP HỆ THỐNG</h2>
-                    {error && <p className="text-red-500 text-xs italic mb-4">{error}</p>}
+                    <h2 className="text-center text-light mb-4">ĐĂNG NHẬP HỆ THỐNG</h2>
+                    {error && <div className="alert alert-danger">{error}</div>}
+                    
                     <div className="mb-4">
-                        <label className="block text-white text-sm font-bold mb-2" htmlFor="email">
+                        <label className="form-label text-white" htmlFor="email">
                             Email
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="email"
-                            type="text"
-                            placeholder="Email"
+                            type="email"
+                            placeholder="Nhập email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            className="form-control"
                         />
                     </div>
-                    <div className="mb-6">
-                        <label className="block text-white text-sm font-bold mb-2" htmlFor="password">
+
+                    <div className="mb-4">
+                        <label className="form-label text-white" htmlFor="password">
                             Mật Khẩu
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
                             id="password"
                             type="password"
-                            placeholder="*********"
+                            placeholder="Nhập mật khẩu"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            className="form-control"
                         />
                     </div>
-                    <div className="flex items-center justify-around">
+
+                    <div className="d-flex justify-content-center">
                         <button
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded focus:outline-none focus:shadow-outline"
                             type="submit"
+                            className="btn btn-primary w-100"
                         >
                             Đăng Nhập
                         </button>

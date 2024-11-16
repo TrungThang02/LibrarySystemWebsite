@@ -78,32 +78,3 @@ main{
   width: 190px;
   align-items:  center;
 } */
-.bgr {
-  position: relative; /* Để định vị lớp phủ overlay */
-  background-image: url(./assets/background.jpg);
-  background-size: cover;
-  background-position: center;
-  height: 100vh; /* Chiều cao toàn màn hình hoặc điều chỉnh tùy ý */
-}
-
-.bgr::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5); 
-  z-index: 1; 
-}
-
-.blur-background {
-  background-color: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(2px); 
-  border-radius: 20px;
-
-}
-.form-container{
-  position: relative;
-  z-index: 2;
-}
